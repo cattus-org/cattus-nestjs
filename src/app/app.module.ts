@@ -17,6 +17,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       autoLoadEntities: true,
       synchronize: true, //desativar em prod
     }),
+    //adicionar modulos aqq
   ],
   controllers: [AppController],
   providers: [AppService],

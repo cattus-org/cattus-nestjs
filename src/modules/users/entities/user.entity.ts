@@ -1,9 +1,11 @@
+import { Cat } from 'src/modules/cats/entities/cat.entity';
 import { Company } from 'src/modules/companies/entities/company.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -25,9 +27,18 @@ export class User {
   @ManyToOne(() => Company, (company) => company.users)
   company: string;
 
+  @OneToMany(() => Cat, (cat) => cat.createdBy)
+  createdAnimals: Cat[];
+
+  @OneToMany(() => Cat, (cat) => cat.updatedBy)
+  updatedAnimals: Cat[];
+
   @CreateDateColumn()
   createdAt?: Date;
 
   @UpdateDateColumn()
   updatedAt?: Date;
+
+  @Column({ default: false })
+  deleted: boolean;
 }
