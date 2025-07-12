@@ -25,7 +25,7 @@ export class User {
   password: string;
 
   @ManyToOne(() => Company, (company) => company.users)
-  company: string;
+  company: number;
 
   @OneToMany(() => Cat, (cat) => cat.createdBy)
   createdAnimals: Cat[];
