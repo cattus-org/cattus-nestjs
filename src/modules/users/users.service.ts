@@ -7,6 +7,8 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersRepository } from './users.repository';
+import { PaginationDTO } from 'src/common/dto/pagination.dto';
+import { hash } from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -14,7 +16,12 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto) {
     try {
-      const newUser = await this.repository.create(createUserDto);
+      const hashedPassword = await hash(createUserDto.password, 10);
+      const newUser = await this.repository.create({
+        ...createUserDto,
+        password: hashedPassword,
+      });
+
       return newUser;
     } catch (error) {
       if (error.code == 23505) {
@@ -29,8 +36,8 @@ export class UsersService {
     }
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll(paginationDTO?: PaginationDTO) {
+    const { limit = 10, offset = 0 } = paginationDTO;
   }
 
   findOne(id: number) {

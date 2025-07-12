@@ -14,18 +14,38 @@ export class UsersRepository {
 
   async create(user: CreateUserDto) {
     const createdUser = this.userRepository.create(user);
-    return await this.userRepository.save(createdUser);
+    const newUser = await this.userRepository.save(createdUser);
+
+    delete newUser.password;
+
+    return newUser;
   }
 
   //adicionar paginação, limite
-  async findAll() {
-    const users = await this.userRepository.find();
+  async findAll(limit: number, offset: number) {
+    const users = await this.userRepository.find({
+      take: limit,
+      skip: offset,
+      order: { id: 'desc' },
+      select: [
+        'id',
+        'company',
+        'email',
+        'name',
+        'createdAt',
+        'updatedAt',
+        'deleted',
+      ],
+    });
     return users;
   }
 
   async findOne(id: number) {
-    const user = await this.userRepository.findOneBy({ id });
-    return user;
+    return await this.userRepository.findOneBy({ id });
+  }
+
+  async findByEmail(email: string) {
+    return await this.userRepository.findOneBy({ email });
   }
 
   async update(id: number, userData: UpdateUserDto) {

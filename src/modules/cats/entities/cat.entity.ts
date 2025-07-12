@@ -1,4 +1,4 @@
-import { CatSex } from 'src/interfaces/cats.interfaces';
+import { CatSex } from 'src/common/interfaces/cats.interfaces';
 import { Company } from 'src/modules/companies/entities/company.entity';
 import { User } from 'src/modules/users/entities/user.entity';
 import {
