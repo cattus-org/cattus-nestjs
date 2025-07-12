@@ -1,11 +1,32 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UsersRepository } from './users.repository';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(private readonly repository: UsersRepository) {}
+
+  async create(createUserDto: CreateUserDto) {
+    try {
+      const newUser = await this.repository.create(createUserDto);
+      return newUser;
+    } catch (error) {
+      if (error.code == 23505) {
+        throw new ConflictException('email already used');
+      }
+
+      //adicionar um log de erro
+      throw new HttpException(
+        `fail to create new user: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   findAll() {
