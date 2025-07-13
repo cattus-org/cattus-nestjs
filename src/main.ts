@@ -17,7 +17,14 @@ async function bootstrap() {
     .setTitle('Cattus API')
     .setDescription('API para gerenciamento de usuários, animais e empresas')
     .setVersion('1.0')
-    .addBearerAuth()
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+      'jwt',
+    )
     .build();
 
   const reflector = app.get(Reflector);

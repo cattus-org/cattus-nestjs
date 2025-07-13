@@ -11,7 +11,11 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiBadRequestResponse, ApiCreatedResponse } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiCreatedResponse,
+} from '@nestjs/swagger';
 import { PaginationDTO } from 'src/common/dto/pagination.dto';
 import { Public } from 'src/common/decorators/public.decorator';
 
@@ -27,11 +31,13 @@ export class UsersController {
     return await this.usersService.create(createUserDto);
   }
 
+  @ApiBearerAuth('jwt')
   @Get()
   findAll(@Query() paginationDTO: PaginationDTO) {
     return this.usersService.findAll(paginationDTO);
   }
 
+  @ApiBearerAuth('jwt') //apenas para testes
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(+id);
