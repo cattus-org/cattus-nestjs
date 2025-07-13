@@ -29,7 +29,7 @@ export class UsersService {
         throw new ConflictException('email already used');
       }
 
-      //adicionar um log de erro
+      //TODO - adicionar um log de erro
       throw new HttpException(
         `fail to create new user: ${error.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -37,8 +37,15 @@ export class UsersService {
     }
   }
 
-  async findAll(paginationDTO?: PaginationDTO) {
+  async findAll(company: number, paginationDTO?: PaginationDTO) {
+    //TODO - adicionar validação de nivel de acesso, talvez nos controllers?
     const { limit = 10, offset = 0 } = paginationDTO;
+    const users = await this.repository.findAll(limit, offset, company);
+    if (users.length === 0) {
+      throw new NotFoundException('users not found');
+    }
+
+    return users;
   }
 
   findOne(id: number) {

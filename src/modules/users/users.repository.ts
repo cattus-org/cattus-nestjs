@@ -21,9 +21,9 @@ export class UsersRepository {
     return newUser;
   }
 
-  //adicionar paginação, limite
-  async findAll(limit: number, offset: number) {
+  async findAll(limit: number, offset: number, company: number) {
     const users = await this.userRepository.find({
+      where: { company },
       take: limit,
       skip: offset,
       order: { id: 'desc' },

@@ -4,4 +4,6 @@ export interface JwtPayload {
   company: number;
   email: string;
   access_level: string;
+  iat: number;
+  ext: number;
 }
