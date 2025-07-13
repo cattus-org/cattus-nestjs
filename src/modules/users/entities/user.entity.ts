@@ -33,6 +33,8 @@ export class User {
   @OneToMany(() => Cat, (cat) => cat.updatedBy)
   updatedAnimals: Cat[];
 
+  //TODO - adicionar access level ou algo assim
+
   @CreateDateColumn()
   createdAt?: Date;
 

@@ -6,10 +6,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from 'src/modules/users/users.module';
 import { CatsModule } from 'src/modules/cats/cats.module';
 import { CompaniesModule } from 'src/modules/companies/companies.module';
+import { AuthModule } from 'src/modules/auth/auth.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.HOST,
@@ -23,6 +24,7 @@ import { CompaniesModule } from 'src/modules/companies/companies.module';
     CatsModule,
     CompaniesModule,
     UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

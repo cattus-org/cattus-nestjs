@@ -3,6 +3,7 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -42,6 +43,15 @@ export class UsersService {
 
   findOne(id: number) {
     return `This action returns a #${id} user`;
+  }
+
+  async findByEmail(email: string) {
+    const findedUser = await this.repository.findByEmail(email);
+    if (!findedUser) {
+      throw new NotFoundException('User not found');
+    }
+
+    return findedUser;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
