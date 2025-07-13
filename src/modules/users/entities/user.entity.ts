@@ -24,6 +24,9 @@ export class User {
   @Column()
   password: string;
 
+  @Column({ default: 'employee' })
+  access_level: string;
+
   @ManyToOne(() => Company, (company) => company.users)
   company: number;
 

@@ -13,11 +13,13 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBadRequestResponse, ApiCreatedResponse } from '@nestjs/swagger';
 import { PaginationDTO } from 'src/common/dto/pagination.dto';
+import { Public } from 'src/common/decorators/public.decorator';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Public()
   @Post('create')
   @ApiCreatedResponse({ description: 'retorna o usuário criado' })
   @ApiBadRequestResponse({ description: 'email already used' })
