@@ -1,4 +1,10 @@
-import { IsString, MaxLength, MinLength } from 'class-validator';
+import {
+  IsNumber,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class CreateCompanyDto {
   @IsString()
@@ -13,5 +19,8 @@ export class CreateCompanyDto {
   @IsString()
   phone: string;
 
+  @IsNumber()
+  @IsOptional()
+  responsible?: { id: number };
   //colocar como opcional a url de logo?
 }

@@ -1,35 +1,46 @@
-import {
-  ConflictException,
-  HttpException,
-  HttpStatus,
-  Injectable,
-} from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { CompaniesRepository } from './companies.repository';
 import { S3Service } from '../aws/s3/s3.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class CompaniesService {
   constructor(
     private readonly companiesRepository: CompaniesRepository,
     private readonly s3Service: S3Service,
+    private readonly usersService: UsersService,
   ) {}
 
-  async create(createCompanyDto: CreateCompanyDto, file: Express.Multer.File) {
+  async create(
+    createCompanyDto: CreateCompanyDto,
+    file: Express.Multer.File,
+    userId: number,
+  ) {
     try {
-      //adicionar lógica pra pegar nome do responsável e atualizar user com a company
+      const findedUser = await this.usersService.findOneById(userId);
+      if (findedUser.company)
+        throw new ConflictException('user already have a company');
+
       const cnpjAlreadyUsed = await this.companiesRepository.findByCnpj(
         createCompanyDto.cnpj,
       );
       if (cnpjAlreadyUsed) throw new ConflictException('cnpj already used');
 
-      let logotype: string | undefined;
+      let logotype: string;
       if (file) {
         logotype = await this.s3Service.uploadFile(file);
       }
 
-      return await this.companiesRepository.create(createCompanyDto, logotype);
+      const company = await this.companiesRepository.create(
+        { ...createCompanyDto, responsible: { id: userId } },
+        logotype,
+      );
+
+      await this.usersService.addCompany(company.id, userId);
+
+      return company;
     } catch (error) {
       //TODO - adicionar um log de erro
       throw error;

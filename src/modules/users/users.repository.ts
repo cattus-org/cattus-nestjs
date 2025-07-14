@@ -3,7 +3,7 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class UsersRepository {
@@ -40,8 +40,11 @@ export class UsersRepository {
     return users;
   }
 
-  async findOne(id: number) {
-    return await this.userRepository.findOneBy({ id });
+  async findOneById(id: number) {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) throw new NotFoundException('user not found');
+
+    return user;
   }
 
   async findByEmail(email: string) {
@@ -55,9 +58,20 @@ export class UsersRepository {
     user.password = userData.password ?? user.password;
     user.name = userData?.name ?? user.name;
 
-    await this.userRepository.save(user);
+    const updatedUser = await this.userRepository.save(user);
+    delete updatedUser.password;
 
-    return user;
+    return updatedUser;
+  }
+
+  async addCompany(companyId: number, userId: number) {
+    const user = await this.userRepository.findOneBy({ id: userId });
+    user.company = companyId;
+
+    const updatedUser = await this.userRepository.save(user);
+    delete updatedUser.password;
+
+    return updatedUser;
   }
 
   async softDelete(id: number) {

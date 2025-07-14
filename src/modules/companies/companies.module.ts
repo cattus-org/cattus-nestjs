@@ -4,12 +4,12 @@ import { CompaniesController } from './companies.controller';
 import { Company } from './entities/company.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { S3Module } from '../aws/s3/s3.module';
-import { S3Service } from '../aws/s3/s3.service';
 import { CompaniesRepository } from './companies.repository';
+import { UsersModule } from '../users/users.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Company]), S3Module],
+  imports: [TypeOrmModule.forFeature([Company]), S3Module, UsersModule],
   controllers: [CompaniesController],
-  providers: [CompaniesService, CompaniesRepository, S3Service],
+  providers: [CompaniesService, CompaniesRepository],
 })
 export class CompaniesModule {}

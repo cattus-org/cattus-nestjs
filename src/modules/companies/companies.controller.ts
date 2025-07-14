@@ -16,6 +16,8 @@ import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { JwtPayload } from 'src/common/interfaces/jwt-payload.interfaces';
 
 @Controller('companies')
 export class CompaniesController {
@@ -43,8 +45,9 @@ export class CompaniesController {
   async create(
     @Body() createCompanyDto: CreateCompanyDto,
     @UploadedFile() file: Express.Multer.File,
+    @CurrentUser() user: JwtPayload,
   ) {
-    return await this.companiesService.create(createCompanyDto, file);
+    return await this.companiesService.create(createCompanyDto, file, user.id);
   }
 
   @Get()

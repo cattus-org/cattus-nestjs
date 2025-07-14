@@ -1,7 +1,5 @@
 import {
   ConflictException,
-  HttpException,
-  HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -44,21 +42,35 @@ export class UsersService {
     return users;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  async findByEmail(email: string) {
-    const findedUser = await this.repository.findByEmail(email);
-    if (!findedUser) {
-      throw new NotFoundException('User not found');
-    }
+  async findOneById(id: number) {
+    const findedUser = await this.repository.findOneById(id);
+    if (!findedUser) throw new NotFoundException('user not found');
 
     return findedUser;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  async findByEmail(email: string) {
+    const findedUser = await this.repository.findByEmail(email);
+    if (!findedUser) throw new NotFoundException('user not found');
+
+    return findedUser;
+  }
+
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    //adicionar validação da existencia do user
     return `This action updates a #${id} user`;
+  }
+
+  async addCompany(companyId: number, userId: number) {
+    try {
+      const findedUser = await this.repository.findOneById(userId);
+      if (!findedUser) throw new NotFoundException('user not found');
+      const updatedUser = await this.repository.addCompany(companyId, userId);
+
+      return updatedUser;
+    } catch (error) {
+      throw error;
+    }
   }
 
   remove(id: number) {
