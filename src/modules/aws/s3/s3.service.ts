@@ -17,7 +17,7 @@ export class S3Service {
   }
 
   async uploadFile(file: Express.Multer.File, folder = 'companies') {
-    const fileKey = `${folder}/${randomUUID()}-${file.originalname}`;
+    const fileKey = `${folder}/${randomUUID()}-${file.originalname.replace(/\s/g, '')}`;
 
     const command = new PutObjectCommand({
       Bucket: process.env.BUCKET_NAME,

@@ -28,12 +28,8 @@ export class UsersService {
       if (error.code == 23505) {
         throw new ConflictException('email already used');
       }
-
       //TODO - adicionar um log de erro
-      throw new HttpException(
-        `fail to create new user: ${error.message}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw error;
     }
   }
 

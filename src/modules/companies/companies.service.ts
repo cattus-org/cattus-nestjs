@@ -19,6 +19,11 @@ export class CompaniesService {
   async create(createCompanyDto: CreateCompanyDto, file: Express.Multer.File) {
     try {
       //adicionar lógica pra pegar nome do responsável e atualizar user com a company
+      const cnpjAlreadyUsed = await this.companiesRepository.findByCnpj(
+        createCompanyDto.cnpj,
+      );
+      if (cnpjAlreadyUsed) throw new ConflictException('cnpj already used');
+
       let logotype: string | undefined;
       if (file) {
         logotype = await this.s3Service.uploadFile(file);
@@ -26,15 +31,8 @@ export class CompaniesService {
 
       return await this.companiesRepository.create(createCompanyDto, logotype);
     } catch (error) {
-      if (error.code == 23505) {
-        throw new ConflictException('cnpj already used');
-      }
-
       //TODO - adicionar um log de erro
-      throw new HttpException(
-        `fail to create new company: ${error.message}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw error;
     }
   }
 

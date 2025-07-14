@@ -19,4 +19,8 @@ export class CompaniesRepository {
 
     return await this.companiesRepository.save(createdCompany);
   }
+
+  async findByCnpj(cnpj: string) {
+    return await this.companiesRepository.findOneBy({ cnpj });
+  }
 }
