@@ -1,11 +1,41 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
+import { CompaniesRepository } from './companies.repository';
+import { S3Service } from '../aws/s3/s3.service';
 
 @Injectable()
 export class CompaniesService {
-  create(createCompanyDto: CreateCompanyDto) {
-    return 'This action adds a new company';
+  constructor(
+    private readonly companiesRepository: CompaniesRepository,
+    private readonly s3Service: S3Service,
+  ) {}
+
+  async create(createCompanyDto: CreateCompanyDto, file: Express.Multer.File) {
+    try {
+      //adicionar lógica pra pegar nome do responsável e atualizar user com a company
+      let logotype: string | undefined;
+      if (file) {
+        logotype = await this.s3Service.uploadFile(file);
+      }
+
+      return await this.companiesRepository.create(createCompanyDto, logotype);
+    } catch (error) {
+      if (error.code == 23505) {
+        throw new ConflictException('cnpj already used');
+      }
+
+      //TODO - adicionar um log de erro
+      throw new HttpException(
+        `fail to create new company: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   findAll() {

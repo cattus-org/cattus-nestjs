@@ -7,6 +7,7 @@ import { UsersModule } from 'src/modules/users/users.module';
 import { CatsModule } from 'src/modules/cats/cats.module';
 import { CompaniesModule } from 'src/modules/companies/companies.module';
 import { AuthModule } from 'src/modules/auth/auth.module';
+import { S3Module } from 'src/modules/aws/s3/s3.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { AuthModule } from 'src/modules/auth/auth.module';
     CompaniesModule,
     UsersModule,
     AuthModule,
+    S3Module,
   ],
   controllers: [AppController],
   providers: [AppService],
