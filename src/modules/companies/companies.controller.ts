@@ -31,9 +31,9 @@ export class CompaniesController {
     schema: {
       type: 'object',
       properties: {
-        name: { type: 'string' },
-        cnpj: { type: 'string' },
-        phone: { type: 'string' },
+        name: { example: 'Cattus LTDA', type: 'string' },
+        cnpj: { example: '12332123457890', type: 'string' },
+        phone: { example: '(13)3822-0000', type: 'string' },
         logotype: {
           type: 'string',
           format: 'binary',

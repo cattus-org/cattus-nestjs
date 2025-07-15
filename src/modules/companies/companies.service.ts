@@ -19,8 +19,11 @@ export class CompaniesService {
     userId: number,
   ) {
     try {
-      const findedUser = await this.usersService.findOneById(userId);
-      if (findedUser.company)
+      //TODO - adicionar validação de arquivos - se veio/n e/ou se é uma imagem
+      //TODO - fazer swagger
+      //TODO - adicionar log de ação
+      const user = await this.usersService.findOneById(userId);
+      if (user.company)
         throw new ConflictException('user already have a company');
 
       const cnpjAlreadyUsed = await this.companiesRepository.findByCnpj(
@@ -34,11 +37,11 @@ export class CompaniesService {
       }
 
       const company = await this.companiesRepository.create(
-        { ...createCompanyDto, responsible: { id: userId } },
+        { ...createCompanyDto, responsible: user },
         logotype,
       );
 
-      await this.usersService.addCompany(company.id, userId);
+      await this.usersService.addCompanyAndAccessLevel(company, userId);
 
       return company;
     } catch (error) {

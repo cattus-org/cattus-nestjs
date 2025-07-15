@@ -8,6 +8,9 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersRepository } from './users.repository';
 import { PaginationDTO } from 'src/common/dto/pagination.dto';
 import { hash } from 'bcrypt';
+import { JwtPayload } from 'src/common/interfaces/jwt-payload.interfaces';
+import { hasRoleOrSelf } from 'src/common/helpers/access-level.helper';
+import { Company } from '../companies/entities/company.entity';
 
 @Injectable()
 export class UsersService {
@@ -32,9 +35,14 @@ export class UsersService {
   }
 
   async findAll(company: number, paginationDTO?: PaginationDTO) {
-    //TODO - adicionar validação de nivel de acesso, talvez nos controllers?
-    const { limit = 10, offset = 0 } = paginationDTO;
-    const users = await this.repository.findAll(limit, offset, company);
+    //TODO - adicionar validação de nivel de acesso, talvez nos controllers? - ta lá já
+    const { limit = 10, offset = 0, deleted = false } = paginationDTO;
+    const users = await this.repository.findAll(
+      limit,
+      offset,
+      deleted,
+      company,
+    );
     if (users.length === 0) {
       throw new NotFoundException('users not found');
     }
@@ -49,23 +57,56 @@ export class UsersService {
     return findedUser;
   }
 
-  async findByEmail(email: string) {
+  async findOneByIdWithValidation(id: number, user: JwtPayload) {
+    hasRoleOrSelf({ id: user.id, access_level: user.access_level }, id);
+
+    const findedUser = await this.repository.findOneById(id);
+    if (!findedUser) throw new NotFoundException('user not found');
+
+    return findedUser;
+  }
+
+  async findByEmailWithPassword(email: string) {
     const findedUser = await this.repository.findByEmail(email);
     if (!findedUser) throw new NotFoundException('user not found');
 
     return findedUser;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
-    //adicionar validação da existencia do user
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto, user: JwtPayload) {
+    try {
+      hasRoleOrSelf({ id: user.id, access_level: user.access_level }, id);
+
+      const findedUser = await this.findOneById(id);
+
+      if (updateUserDto.password) {
+        findedUser.password = await hash(updateUserDto.password, 10);
+      }
+
+      findedUser.email = updateUserDto.email ?? findedUser.email;
+      findedUser.name = updateUserDto.name ?? findedUser.name;
+
+      const updatedUser = await this.repository.update(findedUser);
+      delete updatedUser.password;
+
+      return updatedUser;
+    } catch (error) {
+      if (error.code == 23505) {
+        throw new ConflictException('email already used');
+      }
+      //TODO - adicionar um log de erro
+      throw error;
+    }
   }
 
-  async addCompany(companyId: number, userId: number) {
+  async addCompanyAndAccessLevel(company: Company, userId: number) {
     try {
-      const findedUser = await this.repository.findOneById(userId);
-      if (!findedUser) throw new NotFoundException('user not found');
-      const updatedUser = await this.repository.addCompany(companyId, userId);
+      const user = await this.findOneById(userId);
+      user.company = company;
+      user.access_level = 'admin';
+
+      const updatedUser = await this.repository.update(user);
+      delete updatedUser.password;
 
       return updatedUser;
     } catch (error) {
@@ -73,7 +114,15 @@ export class UsersService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async softDelete(id: number, user: JwtPayload) {
+    try {
+      hasRoleOrSelf({ id: user.id, access_level: user.access_level }, id);
+      await this.findOneById(id);
+      const deletedUser = await this.repository.softDelete(id);
+
+      return deletedUser;
+    } catch (error) {
+      throw error;
+    }
   }
 }

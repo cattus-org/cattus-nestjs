@@ -14,9 +14,12 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import {
-  ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiConflictResponse,
   ApiCreatedResponse,
+  ApiNotFoundResponse,
+  ApiResponse,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { PaginationDTO } from 'src/common/dto/pagination.dto';
 import { Public } from 'src/common/decorators/public.decorator';
@@ -31,38 +34,51 @@ export class UsersController {
   //adicionar os status code corretos
   @Public()
   @HttpCode(HttpStatus.CREATED)
-  @Post('create')
+  @Post()
   @ApiCreatedResponse({ description: 'retorna o usuário criado' })
-  @ApiBadRequestResponse({ description: 'email already used' })
+  @ApiConflictResponse({ description: 'email already used' })
   async create(@Body() createUserDto: CreateUserDto) {
     return await this.usersService.create(createUserDto);
   }
 
-  @ApiBearerAuth('jwt')
-  @Roles('admin', 'owner')
   @HttpCode(HttpStatus.OK)
   @Get()
-  findAll(
+  @ApiBearerAuth('jwt')
+  @ApiResponse({ description: 'retorna uma lista com os usuários da empresa' })
+  @ApiUnauthorizedResponse({ description: 'access denied' })
+  @Roles('admin', 'owner')
+  async findAll(
     @Query() paginationDTO: PaginationDTO,
     @CurrentUser() user: JwtPayload,
   ) {
-    console.log(user);
-    return this.usersService.findAll(user.company, paginationDTO);
+    return await this.usersService.findAll(user.company.id, paginationDTO);
   }
 
-  @ApiBearerAuth('jwt') //apenas para testes
+  @HttpCode(HttpStatus.OK)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOneById(+id);
+  @ApiBearerAuth('jwt')
+  @ApiNotFoundResponse({ description: 'user not found' })
+  async findOne(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    return this.usersService.findOneByIdWithValidation(+id, user);
   }
 
+  @HttpCode(HttpStatus.OK) //alterar isso?
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  @ApiBearerAuth('jwt')
+  async update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return await this.usersService.update(+id, updateUserDto, user);
   }
 
+  @HttpCode(HttpStatus.OK) //o correto aqui e no update seria o no_content né, mas fazer o que, quero enxergar o que to fazendo
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  @ApiBearerAuth('jwt')
+  async softDelete(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    return await this.usersService.softDelete(+id, user);
   }
+
+  //TODO - criar rota pra reativar o user
 }

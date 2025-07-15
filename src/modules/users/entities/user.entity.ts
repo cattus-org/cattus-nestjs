@@ -28,15 +28,14 @@ export class User {
   access_level: string;
 
   @ManyToOne(() => Company, (company) => company.users)
-  company: number;
+  company: Company;
 
+  //TODO - só falseio tudo ou adiciono ondelete - cascade
   @OneToMany(() => Cat, (cat) => cat.createdBy)
   createdAnimals: Cat[];
 
   @OneToMany(() => Cat, (cat) => cat.updatedBy)
   updatedAnimals: Cat[];
-
-  //TODO - adicionar access level ou algo assim
 
   @CreateDateColumn()
   createdAt?: Date;

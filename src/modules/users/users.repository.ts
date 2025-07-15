@@ -1,9 +1,8 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class UsersRepository {
@@ -21,9 +20,14 @@ export class UsersRepository {
     return newUser;
   }
 
-  async findAll(limit: number, offset: number, company: number) {
+  async findAll(
+    limit: number,
+    offset: number,
+    deleted: boolean,
+    company: number,
+  ) {
     const users = await this.userRepository.find({
-      where: { company },
+      where: { company: { id: company }, deleted },
       take: limit,
       skip: offset,
       order: { id: 'desc' },
@@ -41,37 +45,21 @@ export class UsersRepository {
   }
 
   async findOneById(id: number) {
-    const user = await this.userRepository.findOneBy({ id });
-    if (!user) throw new NotFoundException('user not found');
-
-    return user;
+    return await this.userRepository.findOne({
+      where: { id },
+      relations: ['company'],
+    });
   }
 
   async findByEmail(email: string) {
-    return await this.userRepository.findOneBy({ email });
+    return await this.userRepository.findOne({
+      where: { email },
+      relations: ['company'],
+    });
   }
 
-  async update(id: number, userData: UpdateUserDto) {
-    const user = await this.userRepository.findOneBy({ id });
-
-    user.email = userData?.email ?? user.email;
-    user.password = userData.password ?? user.password;
-    user.name = userData?.name ?? user.name;
-
-    const updatedUser = await this.userRepository.save(user);
-    delete updatedUser.password;
-
-    return updatedUser;
-  }
-
-  async addCompany(companyId: number, userId: number) {
-    const user = await this.userRepository.findOneBy({ id: userId });
-    user.company = companyId;
-
-    const updatedUser = await this.userRepository.save(user);
-    delete updatedUser.password;
-
-    return updatedUser;
+  async update(user: User) {
+    return await this.userRepository.save(user);
   }
 
   async softDelete(id: number) {

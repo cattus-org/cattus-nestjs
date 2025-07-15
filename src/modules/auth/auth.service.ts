@@ -12,7 +12,9 @@ export class AuthService {
   ) {}
 
   async signIn(loginDto: LoginDto) {
-    const user = await this.usersService.findByEmail(loginDto.email);
+    const user = await this.usersService.findByEmailWithPassword(
+      loginDto.email,
+    );
     const isMatch = await compare(loginDto.password, user.password);
 
     if (!isMatch) {

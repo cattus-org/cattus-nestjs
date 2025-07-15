@@ -15,19 +15,18 @@ export class CreateUserDto {
   @MinLength(5)
   name: string;
 
-  @ApiProperty({ example: 'vgl@email.com' })
+  @ApiProperty({ example: 'email@example.com' })
   @IsNotEmpty()
   @IsEmail()
   email: string;
 
-  @ApiProperty({ example: 'senhaForte@123' })
+  @ApiProperty({ example: 'senhaForte@1234' })
   @IsNotEmpty()
   @IsString()
   @MinLength(6)
   password: string;
 
-  @ApiProperty({ example: 'não sei ainda' })
   @IsNumber()
   @IsOptional()
-  company?: number;
+  company?: { id: number };
 }
