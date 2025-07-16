@@ -24,6 +24,8 @@ export class UsersService {
         password: hashedPassword,
       });
 
+      delete newUser.password;
+
       return newUser;
     } catch (error) {
       if (error.code == 23505) {
@@ -43,9 +45,6 @@ export class UsersService {
       deleted,
       company,
     );
-    if (users.length === 0) {
-      throw new NotFoundException('users not found');
-    }
 
     return users;
   }

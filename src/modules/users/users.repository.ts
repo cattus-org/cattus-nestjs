@@ -13,11 +13,7 @@ export class UsersRepository {
 
   async create(user: CreateUserDto) {
     const createdUser = this.userRepository.create(user);
-    const newUser = await this.userRepository.save(createdUser);
-
-    delete newUser.password;
-
-    return newUser;
+    return await this.userRepository.save(createdUser);
   }
 
   async findAll(
@@ -26,7 +22,7 @@ export class UsersRepository {
     deleted: boolean,
     company: number,
   ) {
-    const users = await this.userRepository.find({
+    return await this.userRepository.find({
       where: { company: { id: company }, deleted },
       take: limit,
       skip: offset,
@@ -41,7 +37,6 @@ export class UsersRepository {
         'deleted',
       ],
     });
-    return users;
   }
 
   async findOneById(id: number) {
