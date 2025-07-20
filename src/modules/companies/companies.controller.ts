@@ -15,7 +15,7 @@ import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { JwtPayload } from 'src/common/interfaces/jwt-payload.interfaces';
 
@@ -27,20 +27,6 @@ export class CompaniesController {
   @HttpCode(HttpStatus.CREATED)
   @Post()
   @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        name: { example: 'Cattus LTDA', type: 'string' },
-        cnpj: { example: '12332123457890', type: 'string' },
-        phone: { example: '(13)3822-0000', type: 'string' },
-        logotype: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
   @UseInterceptors(FileInterceptor('logotype'))
   async create(
     @Body() createCompanyDto: CreateCompanyDto,
@@ -56,8 +42,8 @@ export class CompaniesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.companiesService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return await this.companiesService.findOneById(+id);
   }
 
   @Patch(':id')

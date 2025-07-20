@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Company } from './entities/company.entity';
 import { Repository } from 'typeorm';
 import { CreateCompanyDto } from './dto/create-company.dto';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class CompaniesRepository {
@@ -11,9 +12,14 @@ export class CompaniesRepository {
     private readonly companiesRepository: Repository<Company>,
   ) {}
 
-  async create(createCompanyDto: CreateCompanyDto, logotype: string) {
+  async create(
+    createCompanyDto: CreateCompanyDto,
+    user: User,
+    logotype: string,
+  ) {
     const createdCompany = this.companiesRepository.create({
       ...createCompanyDto,
+      responsible: user,
       logotype,
     });
 
@@ -22,5 +28,9 @@ export class CompaniesRepository {
 
   async findByCnpj(cnpj: string) {
     return await this.companiesRepository.findOneBy({ cnpj });
+  }
+
+  async findOneById(id: number) {
+    return await this.companiesRepository.findOneBy({ id });
   }
 }

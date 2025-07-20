@@ -6,18 +6,39 @@ import {
   Patch,
   Param,
   Delete,
+  UseInterceptors,
+  UploadedFile,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { CatsService } from './cats.service';
 import { CreateCatDto } from './dto/create-cat.dto';
 import { UpdateCatDto } from './dto/update-cat.dto';
+import { ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { JwtPayload } from 'src/common/interfaces/jwt-payload.interfaces';
 
 @Controller('cats')
 export class CatsController {
   constructor(private readonly catsService: CatsService) {}
 
+  @HttpCode(HttpStatus.CREATED)
   @Post()
-  create(@Body() createCatDto: CreateCatDto) {
-    return this.catsService.create(createCatDto);
+  @ApiConsumes('multipart/form-data')
+  @ApiBearerAuth('jwt')
+  @UseInterceptors(FileInterceptor('picture'))
+  async create(
+    @Body() createCatDto: CreateCatDto,
+    @UploadedFile() picture: Express.Multer.File,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.catsService.create(
+      createCatDto,
+      picture,
+      user.id,
+      user.company.id,
+    );
   }
 
   @Get()

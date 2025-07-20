@@ -33,16 +33,16 @@ export class Cat {
   @Column()
   observations: string;
 
-  @Column('text', { array: true })
+  @Column('text', { array: true, nullable: true })
   vaccines: string[];
 
-  @Column('text', { array: true })
+  @Column('text', { array: true, nullable: true })
   comorbidities: string[];
 
-  @Column()
+  @Column({ nullable: true })
   weight: number;
 
-  @Column()
+  @Column({ default: false })
   favorite: boolean;
 
   @ManyToOne(() => Company, (company) => company.cats)

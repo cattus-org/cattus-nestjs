@@ -62,9 +62,7 @@ export class UsersRepository {
 
     user.deleted = true;
 
-    await this.userRepository.save(user);
-
-    return user;
+    return await this.userRepository.save(user);
   }
 
   async hardDelete(id: number) {

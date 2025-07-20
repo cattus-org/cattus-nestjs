@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { CompaniesRepository } from './companies.repository';
@@ -31,13 +35,11 @@ export class CompaniesService {
       );
       if (cnpjAlreadyUsed) throw new ConflictException('cnpj already used');
 
-      let logotype: string;
-      if (file) {
-        logotype = await this.s3Service.uploadFile(file);
-      }
+      const logotype = await this.s3Service.uploadFile(file);
 
       const company = await this.companiesRepository.create(
-        { ...createCompanyDto, responsible: user },
+        createCompanyDto,
+        user,
         logotype,
       );
 
@@ -54,8 +56,11 @@ export class CompaniesService {
     return `This action returns all companies`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} company`;
+  async findOneById(id: number) {
+    const company = await this.companiesRepository.findOneById(id);
+    if (!company) throw new NotFoundException('company not found');
+
+    return company;
   }
 
   update(id: number, updateCompanyDto: UpdateCompanyDto) {
