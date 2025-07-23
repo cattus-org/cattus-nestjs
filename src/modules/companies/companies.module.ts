@@ -6,9 +6,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { S3Module } from '../aws/s3/s3.module';
 import { CompaniesRepository } from './companies.repository';
 import { UsersModule } from '../users/users.module';
+import { AppLogsModule } from '../app-logs/app-logs.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Company]), S3Module, UsersModule],
+  imports: [
+    TypeOrmModule.forFeature([Company]),
+    S3Module,
+    UsersModule,
+    AppLogsModule,
+  ],
   controllers: [CompaniesController],
   providers: [CompaniesService, CompaniesRepository],
   exports: [CompaniesService],

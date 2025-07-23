@@ -2,8 +2,7 @@ import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateAppLogDto {
   @IsOptional()
-  @IsNumber()
-  userId?: number;
+  user?: number | string;
 
   @IsOptional()
   @IsNumber()
@@ -14,4 +13,7 @@ export class CreateAppLogDto {
 
   @IsString()
   resource: string;
+
+  @IsOptional()
+  details?: string;
 }

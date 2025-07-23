@@ -7,6 +7,7 @@ import { CatsRepository } from './cats.repository';
 import { S3Module } from '../aws/s3/s3.module';
 import { UsersModule } from '../users/users.module';
 import { CompaniesModule } from '../companies/companies.module';
+import { AppLogsModule } from '../app-logs/app-logs.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { CompaniesModule } from '../companies/companies.module';
     S3Module,
     UsersModule,
     CompaniesModule,
+    AppLogsModule,
   ],
   controllers: [CatsController],
   providers: [CatsService, CatsRepository],

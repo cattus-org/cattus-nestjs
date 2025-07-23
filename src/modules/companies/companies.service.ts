@@ -8,6 +8,7 @@ import { UpdateCompanyDto } from './dto/update-company.dto';
 import { CompaniesRepository } from './companies.repository';
 import { S3Service } from '../aws/s3/s3.service';
 import { UsersService } from '../users/users.service';
+import { AppLogsService } from '../app-logs/app-logs.service';
 
 @Injectable()
 export class CompaniesService {
@@ -15,6 +16,7 @@ export class CompaniesService {
     private readonly companiesRepository: CompaniesRepository,
     private readonly s3Service: S3Service,
     private readonly usersService: UsersService,
+    private readonly appLogsService: AppLogsService,
   ) {}
 
   async create(
@@ -23,9 +25,8 @@ export class CompaniesService {
     userId: number,
   ) {
     try {
-      //TODO - adicionar validação de arquivos - se veio/n e/ou se é uma imagem
+      //TODO - adicionar validação de arquivos - se veio/n e/ou se é uma imagem - https://docs.nestjs.com/techniques/file-upload
       //TODO - fazer swagger
-      //TODO - adicionar log de ação
       const user = await this.usersService.findOneById(userId);
       if (user.company)
         throw new ConflictException('user already have a company');
@@ -45,9 +46,21 @@ export class CompaniesService {
 
       await this.usersService.addCompanyAndAccessLevel(company, userId);
 
+      await this.appLogsService.create({
+        user: user.id,
+        action: 'create',
+        resource: 'COMPANIES',
+      });
+
       return company;
     } catch (error) {
-      //TODO - adicionar um log de erro
+      await this.appLogsService.create({
+        user: userId,
+        action: 'create',
+        resource: 'COMPANIES',
+        details: `FAIL: ${error.message}`,
+      });
+
       throw error;
     }
   }
@@ -61,6 +74,10 @@ export class CompaniesService {
     if (!company) throw new NotFoundException('company not found');
 
     return company;
+  }
+
+  async findOneByCNPJ(cnpj: string) {
+    return 'This action returns a company finded by CNPJ';
   }
 
   update(id: number, updateCompanyDto: UpdateCompanyDto) {

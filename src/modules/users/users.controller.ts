@@ -51,7 +51,11 @@ export class UsersController {
     @Query() paginationDTO: PaginationDTO,
     @CurrentUser() user: JwtPayload,
   ) {
-    return await this.usersService.findAll(user.company.id, paginationDTO);
+    return await this.usersService.findAll(
+      user.company.id,
+      user.id,
+      paginationDTO,
+    );
   }
 
   @HttpCode(HttpStatus.OK)

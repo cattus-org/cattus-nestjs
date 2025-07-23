@@ -10,10 +10,10 @@ export class AppLog {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  userId: number;
+  @Column({ nullable: true })
+  user: number | string;
 
-  @Column()
+  @Column({ nullable: true })
   companyId: number;
 
   @Column()
@@ -21,6 +21,9 @@ export class AppLog {
 
   @Column()
   resource: string; //o modulo, ex: "USERS"
+
+  @Column({ nullable: true })
+  details: string;
 
   @CreateDateColumn()
   createdAt: Date;

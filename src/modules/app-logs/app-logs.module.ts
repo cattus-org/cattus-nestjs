@@ -6,5 +6,6 @@ import { AppLogsRepository } from './app-logs.repository';
 @Module({
   controllers: [AppLogsController],
   providers: [AppLogsService, AppLogsRepository],
+  exports: [AppLogsService],
 })
 export class AppLogsModule {}

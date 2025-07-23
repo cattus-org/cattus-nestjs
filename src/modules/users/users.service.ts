@@ -11,23 +11,35 @@ import { hash } from 'bcrypt';
 import { JwtPayload } from 'src/common/interfaces/jwt-payload.interfaces';
 import { hasRoleOrSelf } from 'src/common/helpers/access-level.helper';
 import { Company } from '../companies/entities/company.entity';
+import { AppLogsService } from '../app-logs/app-logs.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly repository: UsersRepository) {}
+  constructor(
+    private readonly repository: UsersRepository,
+    private readonly appLogsService: AppLogsService,
+  ) {}
 
   async create(createUserDto: CreateUserDto) {
     try {
+      //TODO - continuar adicionando logs
       const hashedPassword = await hash(createUserDto.password, 10);
       const newUser = await this.repository.create({
         ...createUserDto,
         password: hashedPassword,
       });
 
+      await this.appLogsService.create({ action: 'create', resource: 'USERS' });
+
       delete newUser.password;
 
       return newUser;
     } catch (error) {
+      await this.appLogsService.create({
+        action: 'create',
+        resource: 'USERS',
+        details: `FAIL: ${error.message}`,
+      });
       if (error.code == 23505) {
         throw new ConflictException('email already used');
       }
@@ -36,7 +48,11 @@ export class UsersService {
     }
   }
 
-  async findAll(company: number, paginationDTO?: PaginationDTO) {
+  async findAll(
+    company: number,
+    userId: number,
+    paginationDTO?: PaginationDTO,
+  ) {
     //TODO - adicionar validação de nivel de acesso, talvez nos controllers? - ta lá já
     const { limit = 10, offset = 0, deleted = false } = paginationDTO;
     const users = await this.repository.findAll(
@@ -46,30 +62,89 @@ export class UsersService {
       company,
     );
 
+    await this.appLogsService.create({
+      action: 'findAll',
+      resource: 'USERS',
+      user: userId,
+      companyId: company,
+    });
+
     return users;
   }
 
   async findOneById(id: number) {
-    const findedUser = await this.repository.findOneById(id);
-    if (!findedUser) throw new NotFoundException('user not found');
+    try {
+      const findedUser = await this.repository.findOneById(id);
+      if (!findedUser) throw new NotFoundException('user not found');
 
-    return findedUser;
+      await this.appLogsService.create({
+        action: 'findOneById',
+        resource: 'USERS',
+      });
+
+      return findedUser;
+    } catch (error) {
+      await this.appLogsService.create({
+        action: 'findOneById',
+        resource: 'USERS',
+        details: `FAIL: ${error.message}`,
+      });
+
+      throw error;
+    }
   }
 
   async findOneByIdWithValidation(id: number, user: JwtPayload) {
-    hasRoleOrSelf({ id: user.id, access_level: user.access_level }, id);
+    try {
+      hasRoleOrSelf({ id: user.id, access_level: user.access_level }, id);
 
-    const findedUser = await this.repository.findOneById(id);
-    if (!findedUser) throw new NotFoundException('user not found');
+      const findedUser = await this.repository.findOneById(id);
+      if (!findedUser) throw new NotFoundException('user not found');
 
-    return findedUser;
+      await this.appLogsService.create({
+        action: 'findOneByIdWithValidation',
+        resource: 'USERS',
+        companyId: user.company.id,
+        user: user.id,
+      });
+
+      return findedUser;
+    } catch (error) {
+      await this.appLogsService.create({
+        action: 'findOneByIdWithValidation',
+        resource: 'USERS',
+        user: user.id,
+        companyId: user.company.id,
+        details: `FAIL: ${error.message}`,
+      });
+
+      throw error;
+    }
   }
 
   async findByEmailWithPassword(email: string) {
-    const findedUser = await this.repository.findByEmail(email);
-    if (!findedUser) throw new NotFoundException('user not found');
+    try {
+      const findedUser = await this.repository.findByEmail(email);
+      if (!findedUser) throw new NotFoundException('user not found');
 
-    return findedUser;
+      await this.appLogsService.create({
+        action: 'findByEmailWithPassword',
+        resource: 'USERS',
+        user: findedUser.id,
+        companyId: findedUser.company.id,
+      });
+
+      return findedUser;
+    } catch (error) {
+      await this.appLogsService.create({
+        action: 'findByEmailWithPassword',
+        resource: 'USERS',
+        user: email,
+        details: `FAIL: ${error.message}`,
+      });
+
+      throw error;
+    }
   }
 
   async update(id: number, updateUserDto: UpdateUserDto, user: JwtPayload) {
@@ -88,12 +163,27 @@ export class UsersService {
       const updatedUser = await this.repository.update(findedUser);
       delete updatedUser.password;
 
+      await this.appLogsService.create({
+        action: 'update',
+        resource: 'USERS',
+        user: user.id,
+        companyId: user.company.id,
+      });
+
       return updatedUser;
     } catch (error) {
+      await this.appLogsService.create({
+        action: 'update',
+        resource: 'USERS',
+        user: user.id,
+        companyId: user.company.id,
+        details: `FAIL: ${error.message}`,
+      });
+
       if (error.code == 23505) {
         throw new ConflictException('email already used');
       }
-      //TODO - adicionar um log de erro
+
       throw error;
     }
   }
@@ -107,8 +197,23 @@ export class UsersService {
       const updatedUser = await this.repository.update(user);
       delete updatedUser.password;
 
+      await this.appLogsService.create({
+        action: 'addCompanyAndAccessLevel',
+        resource: 'USERS',
+        user: user.id,
+        companyId: user.company.id,
+      });
+
       return updatedUser;
     } catch (error) {
+      await this.appLogsService.create({
+        action: 'addCompanyAndAccessLevel',
+        resource: 'USERS',
+        user: userId,
+        companyId: company.id,
+        details: `FAIL: ${error.message}`,
+      });
+
       throw error;
     }
   }
@@ -119,8 +224,23 @@ export class UsersService {
       await this.findOneById(id);
       const deletedUser = await this.repository.softDelete(id);
 
+      await this.appLogsService.create({
+        action: 'softDelete',
+        resource: 'USERS',
+        user: user.id,
+        companyId: user.company.id,
+      });
+
       return deletedUser;
     } catch (error) {
+      await this.appLogsService.create({
+        action: 'softDelete',
+        resource: 'USERS',
+        user: user.id,
+        companyId: user.company.id,
+        details: `FAIL: ${error.message}`,
+      });
+
       throw error;
     }
   }
