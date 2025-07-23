@@ -22,7 +22,6 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto) {
     try {
-      //TODO - continuar adicionando logs
       const hashedPassword = await hash(createUserDto.password, 10);
       const newUser = await this.repository.create({
         ...createUserDto,
@@ -43,7 +42,6 @@ export class UsersService {
       if (error.code == 23505) {
         throw new ConflictException('email already used');
       }
-      //TODO - adicionar um log de erro
       throw error;
     }
   }
@@ -53,7 +51,6 @@ export class UsersService {
     userId: number,
     paginationDTO?: PaginationDTO,
   ) {
-    //TODO - adicionar validação de nivel de acesso, talvez nos controllers? - ta lá já
     const { limit = 10, offset = 0, deleted = false } = paginationDTO;
     const users = await this.repository.findAll(
       limit,

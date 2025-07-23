@@ -70,10 +70,27 @@ export class CompaniesService {
   }
 
   async findOneById(id: number) {
-    const company = await this.companiesRepository.findOneById(id);
-    if (!company) throw new NotFoundException('company not found');
+    try {
+      const company = await this.companiesRepository.findOneById(id);
+      if (!company) throw new NotFoundException('company not found');
 
-    return company;
+      await this.appLogsService.create({
+        action: 'create',
+        resource: 'COMPANIES',
+        companyId: id,
+      });
+
+      return company;
+    } catch (error) {
+      await this.appLogsService.create({
+        action: 'create',
+        resource: 'COMPANIES',
+        details: `FAIL: ${error.message}`,
+        companyId: id,
+      });
+
+      throw error;
+    }
   }
 
   async findOneByCNPJ(cnpj: string) {

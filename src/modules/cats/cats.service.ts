@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCatDto } from './dto/create-cat.dto';
 import { UpdateCatDto } from './dto/update-cat.dto';
 import { CatsRepository } from './cats.repository';
@@ -6,6 +6,7 @@ import { UsersService } from '../users/users.service';
 import { CompaniesService } from '../companies/companies.service';
 import { S3Service } from '../aws/s3/s3.service';
 import { AppLogsService } from '../app-logs/app-logs.service';
+import { PaginationDTO } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class CatsService {
@@ -54,19 +55,171 @@ export class CatsService {
     }
   }
 
-  async findAll() {
-    return `This action returns all cats`;
+  async findAll(
+    companyId: number,
+    userId: number,
+    paginationDTO: PaginationDTO,
+  ) {
+    try {
+      const { limit = 15, offset = 0, deleted = false } = paginationDTO;
+      const findedCats = await this.catsRepository.findAllByCompany(
+        limit,
+        offset,
+        deleted,
+        companyId,
+      );
+
+      await this.appLogsService.create({
+        action: 'findAll',
+        resource: 'CATS',
+        companyId,
+        user: userId,
+      });
+
+      return findedCats;
+    } catch (error) {
+      await this.appLogsService.create({
+        action: 'findAll',
+        resource: 'CATS',
+        companyId,
+        user: userId,
+        details: `FAIL: ${error.message}`,
+      });
+
+      throw error;
+    }
   }
 
-  async findOne(id: number) {
-    return `This action returns a #${id} cat`;
+  async findOneById(catId: number, companyId: number, userId: number) {
+    try {
+      const findedCat = await this.findById(catId, companyId);
+
+      await this.appLogsService.create({
+        action: 'findOneById',
+        resource: 'CATS',
+        companyId,
+        user: userId,
+      });
+
+      return findedCat;
+    } catch (error) {
+      await this.appLogsService.create({
+        action: 'findOneById',
+        resource: 'CATS',
+        companyId,
+        user: userId,
+        details: `FAIL: ${error.message}`,
+      });
+
+      throw error;
+    }
   }
 
-  async update(id: number, updateCatDto: UpdateCatDto) {
-    return `This action updates a #${id} cat`;
+  async findById(catId: number, companyId: number) {
+    try {
+      const findedCat = await this.catsRepository.findById(catId, companyId);
+      if (!findedCat) throw new NotFoundException('cat not found');
+
+      return findedCat;
+    } catch (error) {
+      throw error;
+    }
   }
 
-  async remove(id: number) {
-    return `This action removes a #${id} cat`;
+  async update(
+    catId: number,
+    updateCatDto: UpdateCatDto,
+    companyId: number,
+    userId: number,
+  ) {
+    try {
+      const cat = await this.findById(catId, companyId);
+
+      cat.birthDate = updateCatDto.birthDate ?? cat.birthDate;
+      cat.comorbidities = updateCatDto.comorbidities ?? cat.comorbidities;
+      cat.favorite = updateCatDto.favorite ?? cat.favorite;
+      cat.name = updateCatDto.name ?? cat.name;
+      cat.observations = updateCatDto.observations ?? cat.observations;
+      cat.picture = updateCatDto.picture ?? cat.picture;
+      cat.sex = updateCatDto.sex ?? cat.sex;
+      cat.vaccines = updateCatDto.vaccines ?? cat.vaccines;
+      cat.weight = updateCatDto.weight ?? cat.weight;
+
+      const updatedCat = await this.catsRepository.update(cat);
+
+      await this.appLogsService.create({
+        action: 'update',
+        resource: 'CATS',
+        companyId,
+        user: userId,
+      });
+
+      return updatedCat;
+    } catch (error) {
+      await this.appLogsService.create({
+        action: 'update',
+        resource: 'CATS',
+        companyId,
+        user: userId,
+        details: `FAIL: ${error.message}`,
+      });
+
+      throw error;
+    }
+  }
+
+  async changeFavorite(catId: number, companyId: number, userId: number) {
+    try {
+      const cat = await this.findById(catId, companyId);
+
+      cat.favorite = !cat.favorite;
+
+      const updatedCat = await this.catsRepository.update(cat);
+
+      await this.appLogsService.create({
+        action: 'changeFavorite',
+        resource: 'CATS',
+        companyId,
+        user: userId,
+      });
+
+      return updatedCat;
+    } catch (error) {
+      await this.appLogsService.create({
+        action: 'changeFavorite',
+        resource: 'CATS',
+        companyId,
+        user: userId,
+        details: `FAIL: ${error.message}`,
+      });
+
+      throw error;
+    }
+  }
+
+  async softDelete(catId: number, companyId: number, userId: number) {
+    try {
+      await this.findById(catId, companyId);
+      const softDeletedCat = await this.catsRepository.softDelete(catId);
+
+      await this.appLogsService.create({
+        action: 'softDelete',
+        resource: 'CATS',
+        companyId,
+        user: userId,
+      });
+
+      return softDeletedCat;
+    } catch (error) {
+      await this.appLogsService.create({
+        action: 'softDelete',
+        resource: 'CATS',
+        companyId,
+        user: userId,
+        details: `FAIL: ${error.message}`,
+      });
+
+      throw error;
+    }
   }
 }
