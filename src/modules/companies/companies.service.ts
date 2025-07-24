@@ -47,7 +47,7 @@ export class CompaniesService {
       await this.usersService.addCompanyAndAccessLevel(company, userId);
 
       await this.appLogsService.create({
-        user: user.id,
+        user: userId.toString(),
         action: 'create',
         resource: 'COMPANIES',
       });
@@ -55,7 +55,7 @@ export class CompaniesService {
       return company;
     } catch (error) {
       await this.appLogsService.create({
-        user: userId,
+        user: userId.toString(),
         action: 'create',
         resource: 'COMPANIES',
         details: `FAIL: ${error.message}`,

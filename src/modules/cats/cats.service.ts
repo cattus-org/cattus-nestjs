@@ -29,8 +29,9 @@ export class CatsService {
       const company = await this.companiesService.findOneById(companyId);
       const picture = await this.s3Service.uploadFile(petPicture);
 
+      //transformar os userId em .toString()
       await this.appLogsService.create({
-        user: userId,
+        user: userId.toString(),
         companyId,
         action: 'create',
         resource: 'CATS',
@@ -47,7 +48,7 @@ export class CatsService {
         action: 'create',
         resource: 'CATS',
         companyId,
-        user: userId,
+        user: userId.toString(),
         details: `FAIL: ${error.message}`,
       });
 
@@ -73,7 +74,7 @@ export class CatsService {
         action: 'findAll',
         resource: 'CATS',
         companyId,
-        user: userId,
+        user: userId.toString(),
       });
 
       return findedCats;
@@ -82,7 +83,7 @@ export class CatsService {
         action: 'findAll',
         resource: 'CATS',
         companyId,
-        user: userId,
+        user: userId.toString(),
         details: `FAIL: ${error.message}`,
       });
 
@@ -98,7 +99,7 @@ export class CatsService {
         action: 'findOneById',
         resource: 'CATS',
         companyId,
-        user: userId,
+        user: userId.toString(),
       });
 
       return findedCat;
@@ -107,7 +108,7 @@ export class CatsService {
         action: 'findOneById',
         resource: 'CATS',
         companyId,
-        user: userId,
+        user: userId.toString(),
         details: `FAIL: ${error.message}`,
       });
 
@@ -151,7 +152,7 @@ export class CatsService {
         action: 'update',
         resource: 'CATS',
         companyId,
-        user: userId,
+        user: userId.toString(),
       });
 
       return updatedCat;
@@ -160,7 +161,7 @@ export class CatsService {
         action: 'update',
         resource: 'CATS',
         companyId,
-        user: userId,
+        user: userId.toString(),
         details: `FAIL: ${error.message}`,
       });
 
@@ -180,7 +181,7 @@ export class CatsService {
         action: 'changeFavorite',
         resource: 'CATS',
         companyId,
-        user: userId,
+        user: userId.toString(),
       });
 
       return updatedCat;
@@ -189,7 +190,7 @@ export class CatsService {
         action: 'changeFavorite',
         resource: 'CATS',
         companyId,
-        user: userId,
+        user: userId.toString(),
         details: `FAIL: ${error.message}`,
       });
 
@@ -206,7 +207,7 @@ export class CatsService {
         action: 'softDelete',
         resource: 'CATS',
         companyId,
-        user: userId,
+        user: userId.toString(),
       });
 
       return softDeletedCat;
@@ -215,7 +216,7 @@ export class CatsService {
         action: 'softDelete',
         resource: 'CATS',
         companyId,
-        user: userId,
+        user: userId.toString(),
         details: `FAIL: ${error.message}`,
       });
 

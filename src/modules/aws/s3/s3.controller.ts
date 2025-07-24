@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { S3Service } from './s3.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes } from '@nestjs/swagger';
 
 @Controller('s3')
 export class S3Controller {
@@ -29,6 +29,7 @@ export class S3Controller {
       },
     }),
   )
+  @ApiBearerAuth('jwt')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {

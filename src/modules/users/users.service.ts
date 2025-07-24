@@ -62,7 +62,7 @@ export class UsersService {
     await this.appLogsService.create({
       action: 'findAll',
       resource: 'USERS',
-      user: userId,
+      user: userId.toString(),
       companyId: company,
     });
 
@@ -102,7 +102,7 @@ export class UsersService {
         action: 'findOneByIdWithValidation',
         resource: 'USERS',
         companyId: user.company.id,
-        user: user.id,
+        user: user.id.toString(),
       });
 
       return findedUser;
@@ -110,7 +110,7 @@ export class UsersService {
       await this.appLogsService.create({
         action: 'findOneByIdWithValidation',
         resource: 'USERS',
-        user: user.id,
+        user: user.id.toString(),
         companyId: user.company.id,
         details: `FAIL: ${error.message}`,
       });
@@ -127,7 +127,7 @@ export class UsersService {
       await this.appLogsService.create({
         action: 'findByEmailWithPassword',
         resource: 'USERS',
-        user: findedUser.id,
+        user: findedUser.id.toString(),
         companyId: findedUser.company.id,
       });
 
@@ -163,7 +163,7 @@ export class UsersService {
       await this.appLogsService.create({
         action: 'update',
         resource: 'USERS',
-        user: user.id,
+        user: user.id.toString(),
         companyId: user.company.id,
       });
 
@@ -172,7 +172,7 @@ export class UsersService {
       await this.appLogsService.create({
         action: 'update',
         resource: 'USERS',
-        user: user.id,
+        user: user.id.toString(),
         companyId: user.company.id,
         details: `FAIL: ${error.message}`,
       });
@@ -197,7 +197,7 @@ export class UsersService {
       await this.appLogsService.create({
         action: 'addCompanyAndAccessLevel',
         resource: 'USERS',
-        user: user.id,
+        user: user.id.toString(),
         companyId: user.company.id,
       });
 
@@ -206,7 +206,7 @@ export class UsersService {
       await this.appLogsService.create({
         action: 'addCompanyAndAccessLevel',
         resource: 'USERS',
-        user: userId,
+        user: userId.toString(),
         companyId: company.id,
         details: `FAIL: ${error.message}`,
       });
@@ -224,7 +224,7 @@ export class UsersService {
       await this.appLogsService.create({
         action: 'softDelete',
         resource: 'USERS',
-        user: user.id,
+        user: user.id.toString(),
         companyId: user.company.id,
       });
 
@@ -233,7 +233,7 @@ export class UsersService {
       await this.appLogsService.create({
         action: 'softDelete',
         resource: 'USERS',
-        user: user.id,
+        user: user.id.toString(),
         companyId: user.company.id,
         details: `FAIL: ${error.message}`,
       });

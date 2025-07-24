@@ -31,7 +31,7 @@ export class AuthService {
     }
 
     await this.appLogsService.create({
-      user: user.id,
+      user: user.id.toString(),
       companyId: user.company.id,
       action: 'signIn',
       resource: 'AUTH',

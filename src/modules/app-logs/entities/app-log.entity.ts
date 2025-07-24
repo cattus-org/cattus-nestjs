@@ -11,7 +11,7 @@ export class AppLog {
   id: number;
 
   @Column({ nullable: true })
-  user: number | string;
+  user: string;
 
   @Column({ nullable: true })
   companyId: number;

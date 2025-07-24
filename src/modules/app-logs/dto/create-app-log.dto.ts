@@ -1,8 +1,10 @@
+import { Type } from 'class-transformer';
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateAppLogDto {
   @IsOptional()
-  user?: number | string;
+  @Type(() => String)
+  user?: string;
 
   @IsOptional()
   @IsNumber()
