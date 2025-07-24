@@ -1,5 +1,5 @@
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 
 @Injectable()
@@ -17,6 +17,7 @@ export class S3Service {
   }
 
   async uploadFile(file: Express.Multer.File, folder = 'companies') {
+    if (!file) throw new BadRequestException('file not found');
     const fileKey = `${folder}/${randomUUID()}-${file.originalname.replace(/\s/g, '')}`;
 
     const command = new PutObjectCommand({
