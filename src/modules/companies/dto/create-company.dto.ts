@@ -20,7 +20,7 @@ export class CreateCompanyDto {
   @ApiPropertyOptional({
     type: 'string',
     format: 'binary',
-    description: 'URL do logotipo da empresa',
+    description: 'logotipo da empresa',
   })
   logotype: string;
 }

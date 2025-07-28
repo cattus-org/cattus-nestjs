@@ -39,7 +39,7 @@ export class Cat {
   @Column('text', { array: true, nullable: true })
   comorbidities: string[];
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'numeric' })
   weight: number;
 
   @Column({ default: false })

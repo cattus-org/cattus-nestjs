@@ -11,6 +11,7 @@ import {
   HttpCode,
   HttpStatus,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CatsService } from './cats.service';
 import { CreateCatDto } from './dto/create-cat.dto';
@@ -18,6 +19,7 @@ import { UpdateCatDto } from './dto/update-cat.dto';
 import {
   ApiBearerAuth,
   ApiConsumes,
+  ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiResponse,
 } from '@nestjs/swagger';
@@ -25,7 +27,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { JwtPayload } from 'src/common/interfaces/jwt-payload.interfaces';
 import { PaginationDTO } from 'src/common/dto/pagination.dto';
+import { HasCompanyGuard } from 'src/common/guards/has-company.guard';
 
+@UseGuards(HasCompanyGuard)
 @Controller('cats')
 export class CatsController {
   constructor(private readonly catsService: CatsService) {}
@@ -34,6 +38,7 @@ export class CatsController {
   @Post()
   @ApiConsumes('multipart/form-data')
   @ApiBearerAuth('jwt')
+  @ApiForbiddenResponse({ description: 'user must belong to a company' })
   @UseInterceptors(FileInterceptor('picture'))
   async create(
     @Body() createCatDto: CreateCatDto,
@@ -52,6 +57,7 @@ export class CatsController {
   @Get()
   @ApiBearerAuth('jwt')
   @ApiResponse({ description: 'retorna uma lista com os gatos da company' })
+  @ApiForbiddenResponse({ description: 'user must belong to a company' })
   async findAll(
     @CurrentUser() user: JwtPayload,
     @Query() paginationDTO: PaginationDTO,
@@ -68,6 +74,7 @@ export class CatsController {
   @ApiBearerAuth('jwt')
   @ApiResponse({ description: 'retorna o gato referente ao id' })
   @ApiNotFoundResponse({ description: 'cat not found' })
+  @ApiForbiddenResponse({ description: 'user must belong to a company' })
   async findOneById(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
     return await this.catsService.findOneById(+id, user.company.id, user.id);
   }
@@ -78,6 +85,7 @@ export class CatsController {
   @ApiBearerAuth('jwt')
   @ApiResponse({ description: 'retorna o gato atualizado' })
   @ApiNotFoundResponse({ description: 'cat not found' })
+  @ApiForbiddenResponse({ description: 'user must belong to a company' })
   async update(
     @Param('id') id: string,
     @Body() updateCatDto: UpdateCatDto,
@@ -96,6 +104,7 @@ export class CatsController {
   @ApiBearerAuth('jwt')
   @ApiResponse({ description: 'retorna o gato com deleted: true' })
   @ApiNotFoundResponse({ description: 'cat not found' })
+  @ApiForbiddenResponse({ description: 'user must belong to a company' })
   async softDelete(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
     return this.catsService.softDelete(+id, user.company.id, user.id);
   }

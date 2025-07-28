@@ -127,8 +127,8 @@ export class UsersService {
       await this.appLogsService.create({
         action: 'findByEmailWithPassword',
         resource: 'USERS',
-        user: findedUser.id.toString(),
-        companyId: findedUser.company.id,
+        user: email,
+        companyId: findedUser.company?.id,
       });
 
       return findedUser;
@@ -242,3 +242,8 @@ export class UsersService {
     }
   }
 }
+
+//TODO - adicionar service para adicionar user a determinada company
+//TODO - adicionar recuperação de senha
+//TODO - adicionar validação pra empresa manter pelo menos 1 usuário
+//TODO - adicionar validação pra logar - deleted: false

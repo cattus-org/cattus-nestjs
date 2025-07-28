@@ -17,6 +17,7 @@ export class AuthService {
     const user = await this.usersService.findByEmailWithPassword(
       loginDto.email,
     );
+
     const isMatch = await compare(loginDto.password, user.password);
 
     if (!isMatch) {
@@ -32,7 +33,7 @@ export class AuthService {
 
     await this.appLogsService.create({
       user: user.id.toString(),
-      companyId: user.company.id,
+      companyId: user.company?.id,
       action: 'signIn',
       resource: 'AUTH',
     });

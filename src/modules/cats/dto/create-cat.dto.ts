@@ -8,7 +8,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { CatSex } from 'src/common/interfaces/cats.interfaces';
 
 export class CreateCatDto {
@@ -47,21 +47,43 @@ export class CreateCatDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      try {
+        return JSON.parse(value);
+      } catch {
+        return [value];
+      }
+    }
+    return value;
+  })
   vaccines?: string[];
 
   @ApiPropertyOptional({ type: [String], example: ['Diabetes'] })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      try {
+        return JSON.parse(value);
+      } catch {
+        return [value];
+      }
+    }
+    return value;
+  })
   comorbidities?: string[];
 
   @ApiPropertyOptional({ example: 4.5 })
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   weight?: number;
 
   @ApiPropertyOptional({ example: true })
   @IsOptional()
+  @Type(() => Boolean)
   @IsBoolean()
   favorite?: boolean;
 }
