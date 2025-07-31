@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
   UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
@@ -27,7 +28,18 @@ export class CompaniesController {
   @HttpCode(HttpStatus.CREATED)
   @Post()
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('logotype'))
+  @UseInterceptors(
+    FileInterceptor('logotype', {
+      fileFilter: (req, file, cb) => {
+        const isImage = ['image/jpeg', 'image/png', 'image/webp'].includes(
+          file.mimetype,
+        );
+        if (!isImage)
+          return cb(new BadRequestException('only images are allowed'), false);
+        cb(null, true);
+      },
+    }),
+  )
   async create(
     @Body() createCompanyDto: CreateCompanyDto,
     @UploadedFile() file: Express.Multer.File,
