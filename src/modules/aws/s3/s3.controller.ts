@@ -10,6 +10,7 @@ import {
 import { S3Service } from './s3.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { successResponse } from 'src/common/helpers/response.helper';
 
 @Controller('s3')
 export class S3Controller {
@@ -40,6 +41,8 @@ export class S3Controller {
     },
   })
   async uploadImage(@UploadedFile() file: Express.Multer.File) {
-    return await this.s3Service.uploadFile(file, 'cats-images');
+    const url = await this.s3Service.uploadFile(file, 'cats-images');
+
+    return successResponse({ url }, 'image successfully uploaded');
   }
 }
