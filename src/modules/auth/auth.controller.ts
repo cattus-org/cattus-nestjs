@@ -7,6 +7,7 @@ import {
   ApiNotFoundResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { successResponse } from 'src/common/helpers/response.helper';
 
 @Controller('auth')
 export class AuthController {
@@ -19,6 +20,7 @@ export class AuthController {
   @Public()
   @Post()
   async signIn(@Body() loginDto: LoginDto) {
-    return await this.authService.signIn(loginDto);
+    const { token } = await this.authService.signIn(loginDto);
+    return successResponse({ token }, 'sign in successfully');
   }
 }

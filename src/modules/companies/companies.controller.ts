@@ -19,6 +19,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { JwtPayload } from 'src/common/interfaces/jwt-payload.interfaces';
+import { successResponse } from 'src/common/helpers/response.helper';
 
 @Controller('companies')
 export class CompaniesController {
@@ -45,7 +46,13 @@ export class CompaniesController {
     @UploadedFile() file: Express.Multer.File,
     @CurrentUser() user: JwtPayload,
   ) {
-    return await this.companiesService.create(createCompanyDto, file, user.id);
+    const company = await this.companiesService.create(
+      createCompanyDto,
+      file,
+      user.id,
+    );
+
+    return successResponse(company, 'company successfully created');
   }
 
   @Get()
