@@ -26,6 +26,7 @@ import { Public } from 'src/common/decorators/public.decorator';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { JwtPayload } from 'src/common/interfaces/jwt-payload.interfaces';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import { successResponse } from 'src/common/helpers/response.helper';
 
 @Controller('users')
 export class UsersController {
@@ -38,7 +39,9 @@ export class UsersController {
   @ApiCreatedResponse({ description: 'retorna o usuário criado' })
   @ApiConflictResponse({ description: 'email already used' })
   async create(@Body() createUserDto: CreateUserDto) {
-    return await this.usersService.create(createUserDto);
+    const user = await this.usersService.create(createUserDto);
+
+    return successResponse(user, 'user successfully created');
   }
 
   @HttpCode(HttpStatus.OK)
@@ -51,11 +54,13 @@ export class UsersController {
     @Query() paginationDTO: PaginationDTO,
     @CurrentUser() user: JwtPayload,
   ) {
-    return await this.usersService.findAll(
+    const users = await this.usersService.findAll(
       user.company.id,
       user.id,
       paginationDTO,
     );
+
+    return successResponse(users, 'users successfully rescued');
   }
 
   @HttpCode(HttpStatus.OK)
@@ -63,7 +68,12 @@ export class UsersController {
   @ApiBearerAuth('jwt')
   @ApiNotFoundResponse({ description: 'user not found' })
   async findOne(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
-    return this.usersService.findOneByIdWithValidation(+id, user);
+    const userData = await this.usersService.findOneByIdWithValidation(
+      +id,
+      user,
+    );
+
+    return successResponse(userData, 'user successfully rescued');
   }
 
   @HttpCode(HttpStatus.OK) //alterar isso?
@@ -74,14 +84,22 @@ export class UsersController {
     @Body() updateUserDto: UpdateUserDto,
     @CurrentUser() user: JwtPayload,
   ) {
-    return await this.usersService.update(+id, updateUserDto, user);
+    const updatedUser = await this.usersService.update(
+      +id,
+      updateUserDto,
+      user,
+    );
+
+    return successResponse(updatedUser, 'user successfully updated');
   }
 
   @HttpCode(HttpStatus.OK) //o correto aqui e no update seria o no_content né, mas fazer o que, quero enxergar o que to fazendo
   @Delete(':id')
   @ApiBearerAuth('jwt')
   async softDelete(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
-    return await this.usersService.softDelete(+id, user);
+    const deletedUser = await this.usersService.softDelete(+id, user);
+
+    return successResponse(deletedUser, 'user successfully deleted');
   }
 
   //TODO - criar rota pra reativar o user

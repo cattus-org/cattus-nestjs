@@ -9,6 +9,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import { successResponse } from 'src/common/helpers/response.helper';
 
 @Controller('app-logs')
 export class AppLogsController {
@@ -25,6 +26,11 @@ export class AppLogsController {
     @Query() paginationDTO: PaginationDTO,
     @CurrentUser() user: JwtPayload,
   ) {
-    return await this.appLogsService.findAll(user.company.id, paginationDTO);
+    const logs = await this.appLogsService.findAll(
+      user.company.id,
+      paginationDTO,
+    );
+
+    return successResponse(logs, 'logs successfully rescued');
   }
 }
