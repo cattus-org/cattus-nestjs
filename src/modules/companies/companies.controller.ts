@@ -10,15 +10,24 @@ import {
   HttpCode,
   HttpStatus,
   UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { JwtPayload } from 'src/common/interfaces/jwt-payload.interfaces';
 import { successResponse } from 'src/common/helpers/response.helper';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { CattusAdmin } from 'src/common/constants/user.constants';
 
 @Controller('companies')
 export class CompaniesController {
@@ -28,7 +37,19 @@ export class CompaniesController {
   @HttpCode(HttpStatus.CREATED)
   @Post()
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('logotype'))
+  @ApiResponse({ description: 'returns a new company' })
+  @UseInterceptors(
+    FileInterceptor('logotype', {
+      fileFilter: (req, file, cb) => {
+        const isImage = ['image/jpeg', 'image/png', 'image/webp'].includes(
+          file.mimetype,
+        );
+        if (!isImage)
+          return cb(new BadRequestException('only images are allowed'), false);
+        cb(null, true);
+      },
+    }),
+  )
   async create(
     @Body() createCompanyDto: CreateCompanyDto,
     @UploadedFile() file: Express.Multer.File,
@@ -43,23 +64,45 @@ export class CompaniesController {
     return successResponse(company, 'company successfully created');
   }
 
+  @ApiBearerAuth('jwt')
+  @HttpCode(HttpStatus.OK)
   @Get()
-  findAll() {
-    return this.companiesService.findAll();
+  @Roles(CattusAdmin)
+  async findAll() {
+    return await this.companiesService.findAll();
   }
 
+  @ApiBearerAuth('jwt')
+  @HttpCode(HttpStatus.OK)
   @Get(':id')
+  @Roles(CattusAdmin)
   async findOneByCNPJ(@Param('id') cnpj: string) {
     return await this.companiesService.findOneByCNPJ(cnpj);
   }
 
+  @ApiBearerAuth('jwt')
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({ description: 'returns an updated company' })
+  @ApiForbiddenResponse({ description: 'access denied' })
+  @ApiNotFoundResponse({ description: 'company not found' })
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCompanyDto: UpdateCompanyDto) {
-    return this.companiesService.update(+id, updateCompanyDto);
+  async update(
+    @Param('id') id: string,
+    @CurrentUser() user: JwtPayload,
+    @Body() updateCompanyDto: UpdateCompanyDto,
+  ) {
+    return await this.companiesService.update(+id, user, updateCompanyDto);
   }
 
+  @ApiBearerAuth('jwt')
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({ description: 'returns a soft deleted company' })
+  @ApiForbiddenResponse({ description: 'access denied' })
+  @ApiNotFoundResponse({ description: 'company not found' })
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.companiesService.remove(+id);
+  async softDelete(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    return await this.companiesService.softDelete(+id, user);
   }
 }
+
+//TODO - arrumar forbidden / unauthorized - ver qual o correto pra cada caso

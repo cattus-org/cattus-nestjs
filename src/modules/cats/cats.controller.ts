@@ -12,6 +12,7 @@ import {
   HttpStatus,
   Query,
   UseGuards,
+  BadRequestException,
 } from '@nestjs/common';
 import { CatsService } from './cats.service';
 import { CreateCatDto } from './dto/create-cat.dto';
@@ -40,7 +41,18 @@ export class CatsController {
   @ApiConsumes('multipart/form-data')
   @ApiBearerAuth('jwt')
   @ApiForbiddenResponse({ description: 'user must belong to a company' })
-  @UseInterceptors(FileInterceptor('picture'))
+  @UseInterceptors(
+    FileInterceptor('picture', {
+      fileFilter: (req, file, cb) => {
+        const isImage = ['image/jpeg', 'image/png', 'image/webp'].includes(
+          file.mimetype,
+        );
+        if (!isImage)
+          return cb(new BadRequestException('only images are allowed'), false);
+        cb(null, true);
+      },
+    }),
+  )
   async create(
     @Body() createCatDto: CreateCatDto,
     @UploadedFile() picture: Express.Multer.File,

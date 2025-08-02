@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -9,6 +10,7 @@ import { CompaniesRepository } from './companies.repository';
 import { S3Service } from '../aws/s3/s3.service';
 import { UsersService } from '../users/users.service';
 import { AppLogsService } from '../app-logs/app-logs.service';
+import { JwtPayload } from 'src/common/interfaces/jwt-payload.interfaces';
 
 @Injectable()
 export class CompaniesService {
@@ -25,8 +27,6 @@ export class CompaniesService {
     userId: number,
   ) {
     try {
-      //TODO - adicionar validação de arquivos - se veio/n e/ou se é uma imagem - https://docs.nestjs.com/techniques/file-upload
-      //TODO - fazer swagger
       const user = await this.usersService.findOneById(userId);
       if (user.company)
         throw new ConflictException('user already have a company');
@@ -65,8 +65,25 @@ export class CompaniesService {
     }
   }
 
-  findAll() {
-    return `This action returns all companies`;
+  async findAll() {
+    try {
+      const companies = await this.companiesRepository.findAll();
+
+      await this.appLogsService.create({
+        action: 'findAll',
+        resource: 'COMPANIES',
+      });
+
+      return companies;
+    } catch (error) {
+      await this.appLogsService.create({
+        action: 'findAll',
+        resource: 'COMPANIES',
+        details: `FAIL: ${error.message}`,
+      });
+
+      throw error;
+    }
   }
 
   async findOneById(id: number) {
@@ -75,7 +92,7 @@ export class CompaniesService {
       if (!company) throw new NotFoundException('company not found');
 
       await this.appLogsService.create({
-        action: 'create',
+        action: 'findOneById',
         resource: 'COMPANIES',
         companyId: id,
       });
@@ -83,7 +100,7 @@ export class CompaniesService {
       return company;
     } catch (error) {
       await this.appLogsService.create({
-        action: 'create',
+        action: 'findOneById',
         resource: 'COMPANIES',
         details: `FAIL: ${error.message}`,
         companyId: id,
@@ -94,14 +111,91 @@ export class CompaniesService {
   }
 
   async findOneByCNPJ(cnpj: string) {
-    return 'This action returns a company finded by CNPJ';
+    try {
+      const company = await this.companiesRepository.findByCnpj(cnpj);
+
+      await this.appLogsService.create({
+        action: 'findOneByCnpj',
+        resource: 'COMPANIES',
+      });
+
+      return company;
+    } catch (error) {
+      await this.appLogsService.create({
+        action: 'findOneByCnpj',
+        resource: 'COMPANIES',
+        details: `FAIL: ${error.message}`,
+      });
+
+      throw error;
+    }
   }
 
-  update(id: number, updateCompanyDto: UpdateCompanyDto) {
-    return `This action updates a #${id} company`;
+  async update(
+    id: number,
+    user: JwtPayload,
+    updateCompanyDto: UpdateCompanyDto,
+  ) {
+    try {
+      if (id !== user.company.id) throw new ForbiddenException('access denied');
+      const company = await this.companiesRepository.findOneById(id);
+      if (!company) throw new NotFoundException('company not found');
+
+      company.name = updateCompanyDto.name ?? company.name;
+      company.phone = updateCompanyDto.phone ?? company.phone;
+      company.logotype = updateCompanyDto.logotype ?? company.logotype;
+
+      const updatedCompany = await this.companiesRepository.update(company);
+
+      await this.appLogsService.create({
+        action: 'update',
+        resource: 'COMPANIES',
+        companyId: user.company.id,
+        user: user.id.toString(),
+      });
+
+      return updatedCompany;
+    } catch (error) {
+      await this.appLogsService.create({
+        action: 'update',
+        resource: 'COMPANIES',
+        companyId: user.company.id,
+        user: user.id.toString(),
+        details: `FAIL: ${error.message}`,
+      });
+
+      throw error;
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} company`;
+  async softDelete(id: number, user: JwtPayload) {
+    try {
+      if (id !== user.company.id) throw new ForbiddenException('access denied');
+      const company = await this.companiesRepository.findOneById(id);
+      if (!company) throw new NotFoundException('company not found');
+
+      const softDeletedCompany = await this.companiesRepository.softDelete(id);
+
+      await this.appLogsService.create({
+        action: 'update',
+        resource: 'COMPANIES',
+        companyId: user.company.id,
+        user: user.id.toString(),
+      });
+
+      return softDeletedCompany;
+    } catch (error) {
+      await this.appLogsService.create({
+        action: 'update',
+        resource: 'COMPANIES',
+        companyId: user.company.id,
+        user: user.id.toString(),
+        details: `FAIL: ${error.message}`,
+      });
+
+      throw error;
+    }
   }
 }
+
+//TODO - adicionar deletedAt pra conseguir criar o job pra excluir sozinho após x tempo
