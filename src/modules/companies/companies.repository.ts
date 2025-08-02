@@ -33,4 +33,20 @@ export class CompaniesRepository {
   async findOneById(id: number) {
     return await this.companiesRepository.findOneBy({ id });
   }
+
+  async findAll() {
+    return await this.companiesRepository.find();
+  }
+
+  async update(company: Company) {
+    return await this.companiesRepository.save(company);
+  }
+
+  async softDelete(id: number) {
+    const company = await this.companiesRepository.findOne({ where: { id } });
+
+    company.deleted = true;
+
+    return await this.companiesRepository.save(company);
+  }
 }
