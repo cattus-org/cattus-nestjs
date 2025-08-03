@@ -12,12 +12,14 @@ import { JwtPayload } from 'src/common/interfaces/jwt-payload.interfaces';
 import { hasRoleOrSelf } from 'src/common/helpers/access-level.helper';
 import { Company } from '../companies/entities/company.entity';
 import { AppLogsService } from '../app-logs/app-logs.service';
+import { CompaniesService } from '../companies/companies.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly repository: UsersRepository,
     private readonly appLogsService: AppLogsService,
+    private readonly companiesService: CompaniesService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -144,6 +146,35 @@ export class UsersService {
     }
   }
 
+  async addCompanyToUser(id: number, company: number) {
+    try {
+      const findedCompany = await this.companiesService.findOneById(id);
+      const user = await this.findOneById(id);
+      user.company = findedCompany;
+
+      const updatedUser = await this.repository.update(user);
+
+      await this.appLogsService.create({
+        action: 'findByEmailWithPassword',
+        resource: 'USERS',
+        user: updatedUser.id.toString(),
+        companyId: updatedUser.company?.id,
+      });
+
+      return updatedUser;
+    } catch (error) {
+      await this.appLogsService.create({
+        action: 'findByEmailWithPassword',
+        resource: 'USERS',
+        user: id.toString(),
+        companyId: company,
+        details: `FAIL: ${error.message}`,
+      });
+
+      throw error;
+    }
+  }
+
   async update(id: number, updateUserDto: UpdateUserDto, user: JwtPayload) {
     try {
       hasRoleOrSelf({ id: user.id, access_level: user.access_level }, id);
@@ -243,7 +274,6 @@ export class UsersService {
   }
 }
 
-//TODO - adicionar service para adicionar user a determinada company
+//TODO - adicionar service para adicionar user a determinada company - pensar na lógica pra isso
 //TODO - adicionar recuperação de senha
 //TODO - adicionar validação pra empresa manter pelo menos 1 usuário
-//TODO - adicionar validação pra logar - deleted: false

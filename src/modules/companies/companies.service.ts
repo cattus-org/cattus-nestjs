@@ -197,5 +197,3 @@ export class CompaniesService {
     }
   }
 }
-
-//TODO - adicionar deletedAt pra conseguir criar o job pra excluir sozinho após x tempo
