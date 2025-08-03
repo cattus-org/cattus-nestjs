@@ -52,11 +52,12 @@ export class CatsRepository {
     return await this.catRepository.save(cat);
   }
 
-  async softDelete(catId: number) {
+  async softDelete(catId: number, deletedAt: Date = new Date()) {
     const findedCat = await this.catRepository.findOne({
       where: { id: catId },
     });
 
+    findedCat.deletedAt = deletedAt;
     findedCat.deleted = true;
 
     return await this.catRepository.save(findedCat);

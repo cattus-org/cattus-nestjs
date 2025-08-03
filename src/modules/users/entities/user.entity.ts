@@ -45,4 +45,7 @@ export class User {
 
   @Column({ default: false })
   deleted: boolean;
+
+  @Column({ default: null })
+  deletedAt: Date;
 }

@@ -46,4 +46,7 @@ export class Company {
 
   @Column({ default: false })
   deleted: boolean;
+
+  @Column({ default: null })
+  deletedAt: Date;
 }

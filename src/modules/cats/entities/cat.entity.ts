@@ -62,4 +62,7 @@ export class Cat {
 
   @Column({ default: false })
   deleted: boolean;
+
+  @Column({ default: null })
+  deletedAt: Date;
 }

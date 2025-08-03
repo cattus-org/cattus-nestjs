@@ -15,7 +15,7 @@ import { successResponse } from 'src/common/helpers/response.helper';
 export class AppLogsController {
   constructor(private readonly appLogsService: AppLogsService) {}
 
-  //TODO - adicionar HttpCode em todas as rotas de todos os módulos
+  //TODO - adicionar HttpCode em todas as rotas de todos os módulos - colocar os corretos, não OK em tudo
   @HttpCode(HttpStatus.OK)
   @Get()
   @ApiBearerAuth('jwt')

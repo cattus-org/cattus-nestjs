@@ -42,9 +42,10 @@ export class CompaniesRepository {
     return await this.companiesRepository.save(company);
   }
 
-  async softDelete(id: number) {
+  async softDelete(id: number, deletedAt: Date = new Date()) {
     const company = await this.companiesRepository.findOne({ where: { id } });
 
+    company.deletedAt = deletedAt;
     company.deleted = true;
 
     return await this.companiesRepository.save(company);
