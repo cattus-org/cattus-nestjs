@@ -27,6 +27,8 @@ import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { JwtPayload } from 'src/common/interfaces/jwt-payload.interfaces';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { successResponse } from 'src/common/helpers/response.helper';
+import { ForgotPasswordDto } from '../auth/dto/forgot-password.dto';
+import { ResetPasswordDto } from '../auth/dto/reset-password.dto';
 
 @Controller('users')
 export class UsersController {
@@ -100,6 +102,34 @@ export class UsersController {
     const deletedUser = await this.usersService.softDelete(+id, user);
 
     return successResponse(deletedUser, 'user successfully deleted');
+  }
+
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @Post('forgot-password')
+  @ApiResponse({
+    description: 'returns: If your email exists, a reset link has been sent',
+  })
+  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    await this.usersService.sendPasswordReset(forgotPasswordDto.email);
+
+    return successResponse(
+      null,
+      'If your email exists, a reset link has been sent',
+    );
+  }
+
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @Post('reset-password')
+  @ApiResponse({ description: 'returns: password updated successfully' })
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    await this.usersService.resetPassword(
+      resetPasswordDto.token,
+      resetPasswordDto.newPassword,
+    );
+
+    return successResponse(null, 'password updated successfully');
   }
 
   //TODO - criar rota pra reativar o user

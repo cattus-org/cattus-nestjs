@@ -1,4 +1,5 @@
 import {
+  BadGatewayException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -13,6 +14,9 @@ import { hasRoleOrSelf } from 'src/common/helpers/access-level.helper';
 import { Company } from '../companies/entities/company.entity';
 import { AppLogsService } from '../app-logs/app-logs.service';
 import { CompaniesService } from '../companies/companies.service';
+import { randomBytes } from 'crypto';
+import { addMinutes } from 'date-fns';
+import { PasswordResetRepository } from '../auth/password-reset.repository';
 
 @Injectable()
 export class UsersService {
@@ -20,6 +24,7 @@ export class UsersService {
     private readonly repository: UsersRepository,
     private readonly appLogsService: AppLogsService,
     private readonly companiesService: CompaniesService,
+    private readonly passwordResetRepository: PasswordResetRepository,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -132,6 +137,32 @@ export class UsersService {
         user: email,
         companyId: findedUser.company?.id,
       });
+
+      return findedUser;
+    } catch (error) {
+      await this.appLogsService.create({
+        action: 'findByEmailWithPassword',
+        resource: 'USERS',
+        user: email,
+        details: `FAIL: ${error.message}`,
+      });
+
+      throw error;
+    }
+  }
+
+  async findByEmailWithotPassword(email: string) {
+    try {
+      const findedUser = await this.repository.findByEmail(email);
+
+      await this.appLogsService.create({
+        action: 'findByEmailWithPassword',
+        resource: 'USERS',
+        user: email,
+        companyId: findedUser.company?.id,
+      });
+
+      delete findedUser.password;
 
       return findedUser;
     } catch (error) {
@@ -272,8 +303,76 @@ export class UsersService {
       throw error;
     }
   }
+
+  async sendPasswordReset(email: string) {
+    try {
+      const user = await this.findByEmailWithotPassword(email);
+      if (!user) return; //pra n avisar se o email existe ou nao
+
+      const token = randomBytes(32).toString('hex');
+      const expiresAt = addMinutes(new Date(), 30);
+
+      const resetToken = await this.passwordResetRepository.create(
+        token,
+        user,
+        expiresAt,
+      );
+
+      await this.appLogsService.create({
+        user: user.id.toString(),
+        companyId: user.company?.id,
+        action: 'sendPasswordReset',
+        resource: 'USERS',
+      });
+
+      console.log(resetToken);
+
+      //envio por email o link com o front pra reset
+      //retorno um 'caso o email esteja cadastrado, terá sido enviado'?
+    } catch (error) {
+      await this.appLogsService.create({
+        user: email,
+        action: 'sendPasswordReset',
+        resource: 'USERS',
+      });
+
+      throw error;
+    }
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    try {
+      const findedToken =
+        await this.passwordResetRepository.findOneByToken(token);
+
+      if (!findedToken || findedToken.expiresAt < new Date())
+        throw new BadGatewayException('invalid token or not found');
+
+      findedToken.user.password = await hash(newPassword, 10);
+
+      await this.repository.update(findedToken.user);
+      await this.passwordResetRepository.remove(findedToken.id);
+
+      await this.appLogsService.create({
+        user: findedToken.user.id.toString(),
+        action: 'resetPassword',
+        resource: 'USERS',
+      });
+
+      return 'password updated successfully';
+    } catch (error) {
+      await this.appLogsService.create({
+        action: 'sendPasswordReset',
+        resource: 'USERS',
+        details: `FAIL: ${error.message}`,
+      });
+
+      throw error;
+    }
+  }
 }
 
-//TODO - adicionar service para adicionar user a determinada company - pensar na lógica pra isso
+//TODO - adicionar service para adicionar user a determinada company - pensar na lógica pra isso - adicionar dto só pra essa rota?
 //TODO - adicionar recuperação de senha
 //TODO - adicionar validação pra empresa manter pelo menos 1 usuário
+//TODO - fazer uma rota pra pesquisa

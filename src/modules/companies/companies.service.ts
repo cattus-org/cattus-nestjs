@@ -8,16 +8,16 @@ import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { CompaniesRepository } from './companies.repository';
 import { S3Service } from '../aws/s3/s3.service';
-import { UsersService } from '../users/users.service';
 import { AppLogsService } from '../app-logs/app-logs.service';
 import { JwtPayload } from 'src/common/interfaces/jwt-payload.interfaces';
+import { UsersRepository } from '../users/users.repository';
 
 @Injectable()
 export class CompaniesService {
   constructor(
     private readonly companiesRepository: CompaniesRepository,
     private readonly s3Service: S3Service,
-    private readonly usersService: UsersService,
+    private readonly usersRepository: UsersRepository,
     private readonly appLogsService: AppLogsService,
   ) {}
 
@@ -27,7 +27,7 @@ export class CompaniesService {
     userId: number,
   ) {
     try {
-      const user = await this.usersService.findOneById(userId);
+      const user = await this.usersRepository.findOneById(userId); // Use o repositório diretamente
       if (user.company)
         throw new ConflictException('user already have a company');
 
@@ -44,7 +44,10 @@ export class CompaniesService {
         logotype,
       );
 
-      await this.usersService.addCompanyAndAccessLevel(company, userId);
+      // Mova a lógica de atualização do usuário para dentro deste serviço
+      user.company = company;
+      user.access_level = 'admin';
+      await this.usersRepository.update(user); // Use o repositório para atualizar
 
       await this.appLogsService.create({
         user: userId.toString(),
@@ -197,3 +200,4 @@ export class CompaniesService {
     }
   }
 }
+//TODO - arrumar mensagens de erro

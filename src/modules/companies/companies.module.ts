@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 import { CompaniesController } from './companies.controller';
 import { Company } from './entities/company.entity';
@@ -12,7 +12,7 @@ import { AppLogsModule } from '../app-logs/app-logs.module';
   imports: [
     TypeOrmModule.forFeature([Company]),
     S3Module,
-    UsersModule,
+    forwardRef(() => UsersModule),
     AppLogsModule,
   ],
   controllers: [CompaniesController],
