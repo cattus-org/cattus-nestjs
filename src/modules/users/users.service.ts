@@ -17,6 +17,8 @@ import { CompaniesService } from '../companies/companies.service';
 import { randomBytes } from 'crypto';
 import { addMinutes } from 'date-fns';
 import { PasswordResetRepository } from '../auth/password-reset.repository';
+import { EmailService } from '../email/email.service';
+import { recoverPasswordTemplate } from 'src/common/templates/recover-password.template';
 
 @Injectable()
 export class UsersService {
@@ -25,6 +27,7 @@ export class UsersService {
     private readonly appLogsService: AppLogsService,
     private readonly companiesService: CompaniesService,
     private readonly passwordResetRepository: PasswordResetRepository,
+    private readonly emailService: EmailService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -325,10 +328,11 @@ export class UsersService {
         resource: 'USERS',
       });
 
-      console.log(resetToken);
-
-      //envio por email o link com o front pra reset
-      //retorno um 'caso o email esteja cadastrado, terá sido enviado'?
+      await this.emailService.sendMail(
+        user.email,
+        'Recuperação de senha',
+        recoverPasswordTemplate(user.name, resetToken.token),
+      );
     } catch (error) {
       await this.appLogsService.create({
         user: email,

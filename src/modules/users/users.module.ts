@@ -8,11 +8,13 @@ import { AppLogsModule } from '../app-logs/app-logs.module';
 import { CompaniesModule } from '../companies/companies.module';
 import { PasswordResetRepository } from '../auth/password-reset.repository';
 import { PasswordResetToken } from '../auth/entities/password-reset.entity';
+import { EmailModule } from '../email/email.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, PasswordResetToken]),
     AppLogsModule,
+    EmailModule,
     forwardRef(() => CompaniesModule),
   ],
   controllers: [UsersController],
