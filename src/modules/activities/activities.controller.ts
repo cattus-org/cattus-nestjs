@@ -8,6 +8,7 @@ import {
   HttpCode,
   HttpStatus,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ActivitiesService } from './activities.service';
 import { CreateActivityDto } from './dto/create-activity.dto';
@@ -17,6 +18,8 @@ import { JwtPayload } from 'src/common/interfaces/jwt-payload.interfaces';
 import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { PaginationDTO } from 'src/common/dto/pagination.dto';
 import { successResponse } from 'src/common/helpers/response.helper';
+import { Public } from 'src/common/decorators/public.decorator';
+import { ApiKeyGuard } from 'src/common/guards/api-key.guard';
 
 @Controller('activities')
 export class ActivitiesController {
@@ -25,7 +28,8 @@ export class ActivitiesController {
   //bloquear algumas rotas pra só a api poder acessar (create e update)
   @HttpCode(HttpStatus.CREATED)
   @Post()
-  @ApiBearerAuth('jwt')
+  @Public()
+  @UseGuards(ApiKeyGuard)
   async create(@Body() createActivityDto: CreateActivityDto) {
     const activity = await this.activitiesService.create(createActivityDto);
     return successResponse(activity, 'activity created successfully');
@@ -69,7 +73,8 @@ export class ActivitiesController {
 
   @HttpCode(HttpStatus.OK)
   @Patch(':id')
-  @ApiBearerAuth('jwt')
+  @Public()
+  @UseGuards(ApiKeyGuard)
   async update(
     @Param('id') id: string,
     @Body() updateActivityDto: UpdateActivityDto,
