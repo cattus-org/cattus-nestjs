@@ -19,5 +19,6 @@ import { AppLogsModule } from '../app-logs/app-logs.module';
   ],
   controllers: [CatsController],
   providers: [CatsService, CatsRepository],
+  exports: [CatsRepository],
 })
 export class CatsModule {}

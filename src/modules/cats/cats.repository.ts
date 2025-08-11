@@ -48,6 +48,10 @@ export class CatsRepository {
     });
   }
 
+  async findByIdWithoutCompany(id: number) {
+    return await this.catRepository.findOne({ where: { id, deleted: false } });
+  }
+
   async update(cat: Cat) {
     return await this.catRepository.save(cat);
   }

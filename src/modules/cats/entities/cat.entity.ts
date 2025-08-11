@@ -1,4 +1,5 @@
 import { CatSex } from 'src/common/interfaces/cats.interfaces';
+import { Activity } from 'src/modules/activities/entities/activity.entity';
 import { Company } from 'src/modules/companies/entities/company.entity';
 import { User } from 'src/modules/users/entities/user.entity';
 import {
@@ -6,6 +7,7 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -53,6 +55,9 @@ export class Cat {
 
   @ManyToOne(() => User, (user) => user.updatedAnimals)
   updatedBy: User;
+
+  @OneToMany(() => Activity, (activity) => activity.cat)
+  activities: Activity[];
 
   @CreateDateColumn()
   createdAt?: Date;
