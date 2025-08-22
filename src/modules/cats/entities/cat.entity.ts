@@ -1,3 +1,4 @@
+import { CatStatus } from 'src/common/constants/cat.constants';
 import { CatSex } from 'src/common/interfaces/cats.interfaces';
 import { Activity } from 'src/modules/activities/entities/activity.entity';
 import { Company } from 'src/modules/companies/entities/company.entity';
@@ -46,6 +47,9 @@ export class Cat {
 
   @Column({ default: false })
   favorite: boolean;
+
+  @Column({ type: 'enum', enum: CatStatus, default: CatStatus.OK })
+  status: string;
 
   @ManyToOne(() => Company, (company) => company.cats)
   company: Company;

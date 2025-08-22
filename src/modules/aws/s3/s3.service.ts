@@ -47,4 +47,31 @@ export class S3Service {
       throw error;
     }
   }
+
+  async uploadBuffer(
+    buffer: Buffer,
+    key: string,
+    contentType = 'application/pdf',
+  ) {
+    try {
+      const command = new PutObjectCommand({
+        Bucket: process.env.BUCKET_NAME,
+        Key: key,
+        Body: buffer,
+        ContentType: contentType,
+      });
+
+      await this.s3.send(command);
+
+      return `https://${process.env.BUCKET_NAME!}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+    } catch (error) {
+      await this.appLogsService.create({
+        action: 'uploadBuffer',
+        resource: 'S3',
+        details: `FAIL: ${error.message}`,
+      });
+
+      throw error;
+    }
+  }
 }

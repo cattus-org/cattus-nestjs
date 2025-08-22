@@ -9,6 +9,7 @@ import { CompaniesModule } from 'src/modules/companies/companies.module';
 import { AuthModule } from 'src/modules/auth/auth.module';
 import { S3Module } from 'src/modules/aws/s3/s3.module';
 import { ActivitiesModule } from 'src/modules/activities/activities.module';
+import { PdfModule } from 'src/modules/pdf/pdf.module';
 
 @Module({
   imports: [
@@ -16,10 +17,11 @@ import { ActivitiesModule } from 'src/modules/activities/activities.module';
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.HOST,
-      port: 5432,
-      database: process.env.DATABASE,
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
+      // port: 5432,
+      url: process.env.DB_URL,
+      // database: process.env.DATABASE,
+      // username: process.env.DB_USERNAME,
+      // password: process.env.DB_PASSWORD,
       autoLoadEntities: true,
       synchronize: true, //desativar em prod
     }),
@@ -29,6 +31,7 @@ import { ActivitiesModule } from 'src/modules/activities/activities.module';
     AuthModule,
     S3Module,
     ActivitiesModule,
+    PdfModule,
   ],
   controllers: [AppController],
   providers: [AppService],

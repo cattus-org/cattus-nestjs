@@ -140,6 +140,24 @@ export class CatsController {
 
     return successResponse(deletedCat, 'cat deleted successfully');
   }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('report/:id')
+  @ApiBearerAuth('jwt')
+  @ApiResponse({ description: 'return a link for the report' })
+  @ApiForbiddenResponse({ description: 'user must belong to a company' })
+  async generateReport(
+    @Param('id') id: string,
+    @CurrentUser() user: JwtPayload,
+    @Query() paginationDTO: PaginationDTO,
+  ) {
+    const report = await this.catsService.generateReport(
+      user,
+      +id,
+      paginationDTO,
+    );
+    return successResponse(report, 'report generated successfully');
+  }
 }
 
 //TODO - criar job para apagar dados com deleted - colocar um 'deletedDate' nas entidades?

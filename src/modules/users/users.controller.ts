@@ -133,4 +133,5 @@ export class UsersController {
   }
 
   //TODO - criar rota pra reativar o user
+  //TODO - add logoff route
 }

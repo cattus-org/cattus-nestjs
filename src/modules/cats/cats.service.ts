@@ -7,6 +7,8 @@ import { CompaniesService } from '../companies/companies.service';
 import { S3Service } from '../aws/s3/s3.service';
 import { AppLogsService } from '../app-logs/app-logs.service';
 import { PaginationDTO } from 'src/common/dto/pagination.dto';
+import { JwtPayload } from 'src/common/interfaces/jwt-payload.interfaces';
+import { PdfService } from '../pdf/pdf.service';
 
 @Injectable()
 export class CatsService {
@@ -16,6 +18,7 @@ export class CatsService {
     private readonly companiesService: CompaniesService,
     private readonly s3Service: S3Service,
     private readonly appLogsService: AppLogsService,
+    private readonly pdfService: PdfService,
   ) {}
 
   async create(
@@ -217,6 +220,44 @@ export class CatsService {
         resource: 'CATS',
         companyId,
         user: userId.toString(),
+        details: `FAIL: ${error.message}`,
+      });
+
+      throw error;
+    }
+  }
+
+  async generateReport(
+    user: JwtPayload,
+    catId: number,
+    paginationDTO?: PaginationDTO,
+  ) {
+    try {
+      const cat = await this.catsRepository.findById(catId, user.company.id);
+
+      const { limit = 30, offset = 0 } = paginationDTO;
+
+      const report = await this.pdfService.generateCatActivitiesReport(
+        catId,
+        user,
+        cat,
+        { limit, offset },
+      );
+
+      await this.appLogsService.create({
+        action: 'generateReport',
+        resource: 'CAT',
+        companyId: user.company.id,
+        user: user.id.toString(),
+      });
+
+      return { url: report };
+    } catch (error) {
+      await this.appLogsService.create({
+        action: 'generateReport',
+        resource: 'CAT',
+        companyId: user.company.id,
+        user: user.id.toString(),
         details: `FAIL: ${error.message}`,
       });
 
