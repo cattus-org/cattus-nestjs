@@ -71,7 +71,7 @@ export class CatsController {
   @HttpCode(HttpStatus.OK)
   @Get()
   @ApiBearerAuth('jwt')
-  @ApiResponse({ description: 'retorna uma lista com os gatos da company' })
+  @ApiResponse({ description: "returns a list of the company's cats" })
   @ApiForbiddenResponse({ description: 'user must belong to a company' })
   async findAll(
     @CurrentUser() user: JwtPayload,
@@ -90,7 +90,7 @@ export class CatsController {
   @HttpCode(HttpStatus.OK)
   @Get(':id')
   @ApiBearerAuth('jwt')
-  @ApiResponse({ description: 'retorna o gato referente ao id' })
+  @ApiResponse({ description: 'returns a cat' })
   @ApiNotFoundResponse({ description: 'cat not found' })
   @ApiForbiddenResponse({ description: 'user must belong to a company' })
   async findOneById(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
@@ -107,7 +107,7 @@ export class CatsController {
   @HttpCode(HttpStatus.OK)
   @Patch(':id')
   @ApiBearerAuth('jwt')
-  @ApiResponse({ description: 'retorna o gato atualizado' })
+  @ApiResponse({ description: 'returns the cat updated' })
   @ApiNotFoundResponse({ description: 'cat not found' })
   @ApiForbiddenResponse({ description: 'user must belong to a company' })
   async update(
@@ -128,7 +128,7 @@ export class CatsController {
   @HttpCode(HttpStatus.OK)
   @Delete(':id')
   @ApiBearerAuth('jwt')
-  @ApiResponse({ description: 'retorna o gato com deleted: true' })
+  @ApiResponse({ description: 'returns the cat with deleted: true' })
   @ApiNotFoundResponse({ description: 'cat not found' })
   @ApiForbiddenResponse({ description: 'user must belong to a company' })
   async softDelete(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
@@ -144,7 +144,7 @@ export class CatsController {
   @HttpCode(HttpStatus.OK)
   @Get('report/:id')
   @ApiBearerAuth('jwt')
-  @ApiResponse({ description: 'return a link for the report' })
+  @ApiResponse({ description: 'returns a link for the report' })
   @ApiForbiddenResponse({ description: 'user must belong to a company' })
   async generateReport(
     @Param('id') id: string,

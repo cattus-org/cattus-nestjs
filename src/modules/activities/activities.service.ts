@@ -18,7 +18,6 @@ export class ActivitiesService {
   async create(createActivityDto: CreateActivityDto) {
     try {
       const cat = await this.catsRepository.findByIdWithoutCompany(
-        //TODO - faço assim ou dou um jeito da api py me mandar a company?
         createActivityDto.catId,
       );
       if (!cat) throw new NotFoundException('cat not found');

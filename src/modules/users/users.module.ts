@@ -22,4 +22,3 @@ import { EmailModule } from '../email/email.module';
   exports: [UsersService, UsersRepository], //exportando o usersRepository para conseguir utilizar em companies (tinha quebrado por conta do ciclo de deps)
 })
 export class UsersModule {}
-//TODO - trocar o que for user service pra user repository (fora do user) pra o nest n reclamar

@@ -19,7 +19,7 @@ export class AppLogsController {
   @HttpCode(HttpStatus.OK)
   @Get()
   @ApiBearerAuth('jwt')
-  @ApiResponse({ description: 'retorna uma lista com os logs do sistema' })
+  @ApiResponse({ description: 'returns a system logs list' })
   @ApiUnauthorizedResponse({ description: 'access denied' })
   @Roles('admin', 'owner')
   async findAll(

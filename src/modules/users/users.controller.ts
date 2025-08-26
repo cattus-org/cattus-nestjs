@@ -38,7 +38,7 @@ export class UsersController {
   @Public()
   @HttpCode(HttpStatus.CREATED)
   @Post()
-  @ApiCreatedResponse({ description: 'retorna o usuário criado' })
+  @ApiCreatedResponse({ description: 'returns the created user' })
   @ApiConflictResponse({ description: 'email already used' })
   async create(@Body() createUserDto: CreateUserDto) {
     const user = await this.usersService.create(createUserDto);
@@ -49,7 +49,7 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   @Get()
   @ApiBearerAuth('jwt')
-  @ApiResponse({ description: 'retorna uma lista com os usuários da empresa' })
+  @ApiResponse({ description: 'returns the user list' })
   @ApiUnauthorizedResponse({ description: 'access denied' })
   @Roles('admin', 'owner')
   async findAll(

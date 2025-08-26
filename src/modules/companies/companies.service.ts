@@ -44,10 +44,9 @@ export class CompaniesService {
         logotype,
       );
 
-      // Mova a lógica de atualização do usuário para dentro deste serviço
       user.company = company;
       user.access_level = 'admin';
-      await this.usersRepository.update(user); // Use o repositório para atualizar
+      await this.usersRepository.update(user);
 
       await this.appLogsService.create({
         user: userId.toString(),

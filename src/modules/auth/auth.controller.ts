@@ -14,7 +14,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @HttpCode(HttpStatus.OK)
-  @ApiCreatedResponse({ description: 'retorna token' })
+  @ApiCreatedResponse({ description: 'returns token' })
   @ApiUnauthorizedResponse({ description: 'invalid credentials' })
   @ApiNotFoundResponse({ description: 'user not found' })
   @Public()

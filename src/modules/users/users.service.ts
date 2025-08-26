@@ -377,6 +377,5 @@ export class UsersService {
 }
 
 //TODO - adicionar service para adicionar user a determinada company - pensar na lógica pra isso - adicionar dto só pra essa rota?
-//TODO - adicionar recuperação de senha
 //TODO - adicionar validação pra empresa manter pelo menos 1 usuário
-//TODO - fazer uma rota pra pesquisa
+//TODO - fazer uma rota pra pesquisa - criar no filtro de paginação

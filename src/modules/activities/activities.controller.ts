@@ -25,7 +25,6 @@ import { ApiKeyGuard } from 'src/common/guards/api-key.guard';
 export class ActivitiesController {
   constructor(private readonly activitiesService: ActivitiesService) {}
 
-  //bloquear algumas rotas pra só a api poder acessar (create e update)
   @HttpCode(HttpStatus.CREATED)
   @Post()
   @Public()
