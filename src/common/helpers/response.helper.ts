@@ -1,11 +1,7 @@
-export function errorResponse(code: string, message: string, details?: string) {
+export function errorResponse(message: string) {
   return {
     success: false,
     message,
-    error: {
-      code,
-      details,
-    },
   };
 }
 

@@ -84,4 +84,15 @@ export class CamerasController {
     const removedCamera = await this.camerasService.remove(+id, user);
     return successResponse(removedCamera, 'camera deleted successfully');
   }
+
+  @HttpCode(HttpStatus.OK)
+  @Patch(':id/soft-delete')
+  @ApiBearerAuth('jwt')
+  @ApiResponse({ description: 'camera deleted successfully' })
+  @ApiNotFoundResponse({ description: 'camera not found' })
+  @ApiForbiddenResponse({ description: 'user must belong to a company' })
+  async softRemove(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    const removedCamera = await this.camerasService.softDelete(+id, user);
+    return successResponse(removedCamera, 'camera soft deleted successfully');
+  }
 }

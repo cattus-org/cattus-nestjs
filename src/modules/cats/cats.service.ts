@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCatDto } from './dto/create-cat.dto';
 import { UpdateCatDto } from './dto/update-cat.dto';
 import { CatsRepository } from './cats.repository';
@@ -28,6 +32,7 @@ export class CatsService {
     companyId: number,
   ) {
     try {
+      if (!petPicture) throw new BadRequestException('picture not sended');
       const user = await this.usersService.findOneById(userId);
       const company = await this.companiesService.findOneById(companyId);
       const picture = await this.s3Service.uploadFile(petPicture);

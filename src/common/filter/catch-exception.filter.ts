@@ -16,8 +16,6 @@ export class CatchExceptionFilter implements ExceptionFilter {
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Internal server error';
-    let code = 'INTERNAL_SERVER_ERROR';
-    let details: string = null;
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
@@ -28,8 +26,6 @@ export class CatchExceptionFilter implements ExceptionFilter {
       } else if (typeof res === 'object' && res !== null) {
         const responseObj = res as any;
         message = responseObj.message || responseObj.error || message;
-        code = responseObj.code || code;
-        details = responseObj.details || null;
       }
     } else if (exception instanceof Error) {
       message = exception.message;
@@ -39,7 +35,7 @@ export class CatchExceptionFilter implements ExceptionFilter {
       statusCode: status,
       timestamp: new Date().toISOString(),
       path: request.url,
-      ...errorResponse(code, message, details),
+      ...errorResponse(message),
     });
   }
 }

@@ -41,4 +41,4 @@ export class CamerasRepository {
   }
 }
 
-//TODO - adicionar deleted: false nos filtros de busca
+//TODO - adicionar deleted: false nos filtros de busca (em todos)
