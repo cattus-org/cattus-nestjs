@@ -1,3 +1,4 @@
+import { Camera } from 'src/modules/cameras/entities/camera.entity';
 import { Cat } from 'src/modules/cats/entities/cat.entity';
 import { Company } from 'src/modules/companies/entities/company.entity';
 import {
@@ -29,6 +30,9 @@ export class User {
 
   @ManyToOne(() => Company, (company) => company.users)
   company: Company;
+
+  @OneToMany(() => Camera, (camera) => camera.createdBy)
+  createdCameras: Camera[];
 
   //TODO - só falseio tudo ou adiciono ondelete - cascade
   @OneToMany(() => Cat, (cat) => cat.createdBy)

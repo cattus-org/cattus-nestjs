@@ -10,17 +10,18 @@ import { AuthModule } from 'src/modules/auth/auth.module';
 import { S3Module } from 'src/modules/aws/s3/s3.module';
 import { ActivitiesModule } from 'src/modules/activities/activities.module';
 import { PdfModule } from 'src/modules/pdf/pdf.module';
+import { CamerasModule } from 'src/modules/cameras/cameras.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.HOST,
-      // port: 5432,
+      //host: process.env.HOST,
+      //  port: 5432,
       url: process.env.DB_URL,
-      // database: process.env.DATABASE,
-      // username: process.env.DB_USERNAME,
+      //database: process.env.DATABASE,
+      //username: process.env.DB_USERNAME,
       // password: process.env.DB_PASSWORD,
       autoLoadEntities: true,
       synchronize: true, //desativar em prod
@@ -32,6 +33,7 @@ import { PdfModule } from 'src/modules/pdf/pdf.module';
     S3Module,
     ActivitiesModule,
     PdfModule,
+    CamerasModule,
   ],
   controllers: [AppController],
   providers: [AppService],

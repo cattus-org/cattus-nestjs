@@ -57,6 +57,7 @@ export class CatsRepository {
   }
 
   async softDelete(catId: number, deletedAt: Date = new Date()) {
+    //TODO - ta errado essa merda, isso deve ser feito pelo update, não uma função na bosta do repository
     const findedCat = await this.catRepository.findOne({
       where: { id: catId },
     });

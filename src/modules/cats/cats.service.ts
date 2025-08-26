@@ -32,7 +32,13 @@ export class CatsService {
       const company = await this.companiesService.findOneById(companyId);
       const picture = await this.s3Service.uploadFile(petPicture);
 
-      //transformar os userId em .toString()
+      const newCat = await this.catsRepository.create(
+        createCatDto,
+        picture,
+        user,
+        company,
+      );
+
       await this.appLogsService.create({
         user: userId.toString(),
         companyId,
@@ -40,12 +46,7 @@ export class CatsService {
         resource: 'CATS',
       });
 
-      return await this.catsRepository.create(
-        createCatDto,
-        picture,
-        user,
-        company,
-      );
+      return newCat;
     } catch (error) {
       await this.appLogsService.create({
         action: 'create',
