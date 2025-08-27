@@ -207,10 +207,41 @@ export class CatsService {
     }
   }
 
-  async softDelete(catId: number, companyId: number, userId: number) {
+  async remove(catId: number, companyId: number, userId: number) {
     try {
       await this.findById(catId, companyId);
-      const softDeletedCat = await this.catsRepository.softDelete(catId);
+
+      const deletedCat = await this.catsRepository.hardDelete(catId);
+
+      await this.appLogsService.create({
+        action: 'remove',
+        resource: 'CATS',
+        companyId,
+        user: userId.toString(),
+      });
+
+      return deletedCat;
+    } catch (error) {
+      await this.appLogsService.create({
+        action: 'remove',
+        resource: 'CATS',
+        companyId,
+        user: userId.toString(),
+        details: `FAIL: ${error.message}`,
+      });
+
+      throw error;
+    }
+  }
+
+  async softDelete(catId: number, companyId: number, userId: number) {
+    try {
+      const cat = await this.findById(catId, companyId);
+
+      cat.deleted = true;
+      cat.deletedAt = new Date();
+
+      const softDeletedCat = await this.catsRepository.update(cat);
 
       await this.appLogsService.create({
         action: 'softDelete',
@@ -271,3 +302,5 @@ export class CatsService {
     }
   }
 }
+
+//TODO - adicionar paginação e filtros nos getAll

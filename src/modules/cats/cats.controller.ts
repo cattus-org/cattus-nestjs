@@ -86,7 +86,6 @@ export class CatsController {
     return successResponse(cats, 'cats successfully rescued');
   }
 
-  //TODO - trocar TODOS os textos pra inglês
   @HttpCode(HttpStatus.OK)
   @Get(':id')
   @ApiBearerAuth('jwt')
@@ -103,7 +102,6 @@ export class CatsController {
     return successResponse(cat, 'cat successfully rescued');
   }
 
-  //no final do projeto mudar para as respostas corretas
   @HttpCode(HttpStatus.OK)
   @Patch(':id')
   @ApiBearerAuth('jwt')
@@ -126,13 +124,30 @@ export class CatsController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Delete(':id')
+  @Patch(':id/soft-delete')
   @ApiBearerAuth('jwt')
   @ApiResponse({ description: 'returns the cat with deleted: true' })
   @ApiNotFoundResponse({ description: 'cat not found' })
   @ApiForbiddenResponse({ description: 'user must belong to a company' })
   async softDelete(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
     const deletedCat = await this.catsService.softDelete(
+      +id,
+      user.company.id,
+      user.id,
+    );
+
+    return successResponse(deletedCat, 'cat deleted successfully');
+  }
+
+  //TODO - arrumar esse retorno
+  @HttpCode(HttpStatus.OK)
+  @Delete(':id')
+  @ApiBearerAuth('jwt')
+  @ApiResponse({ description: 'returns the cat with deleted: true' })
+  @ApiNotFoundResponse({ description: 'cat not found' })
+  @ApiForbiddenResponse({ description: 'user must belong to a company' })
+  async delete(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    const deletedCat = await this.catsService.remove(
       +id,
       user.company.id,
       user.id,
@@ -161,3 +176,4 @@ export class CatsController {
 }
 
 //TODO - criar job para apagar dados com deleted - colocar um 'deletedDate' nas entidades?
+//TODO - filtrar gets por company
