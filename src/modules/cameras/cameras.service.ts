@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCameraDto } from './dto/create-camera.dto';
 import { UpdateCameraDto } from './dto/update-camera.dto';
 import { JwtPayload } from 'src/common/interfaces/jwt-payload.interfaces';
@@ -176,6 +176,11 @@ export class CamerasService {
 
   async remove(id: number, userJwt: JwtPayload) {
     try {
+      const camera = await this.camerasRepository.findById(
+        id,
+        userJwt.company.id,
+      );
+      if (!camera) throw new NotFoundException('camera not found');
       const deletedCamera = await this.camerasRepository.remove(id);
       await this.appLogsService.create({
         action: 'remove',

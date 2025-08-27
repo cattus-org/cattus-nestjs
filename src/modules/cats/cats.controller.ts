@@ -124,6 +124,25 @@ export class CatsController {
   }
 
   @HttpCode(HttpStatus.OK)
+  @Patch(':id/change-favorite')
+  @ApiBearerAuth('jwt')
+  @ApiResponse({ description: 'returns the cat with deleted: true' })
+  @ApiNotFoundResponse({ description: 'cat not found' })
+  @ApiForbiddenResponse({ description: 'user must belong to a company' })
+  async changeFavorite(
+    @Param('id') id: string,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    const deletedCat = await this.catsService.changeFavorite(
+      +id,
+      user.company.id,
+      user.id,
+    );
+
+    return successResponse(deletedCat, 'favorite updated successfully');
+  }
+
+  @HttpCode(HttpStatus.OK)
   @Patch(':id/soft-delete')
   @ApiBearerAuth('jwt')
   @ApiResponse({ description: 'returns the cat with deleted: true' })
@@ -136,24 +155,20 @@ export class CatsController {
       user.id,
     );
 
-    return successResponse(deletedCat, 'cat deleted successfully');
+    return successResponse(deletedCat, 'cat soft deleted successfully');
   }
 
   //TODO - arrumar esse retorno
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   @ApiBearerAuth('jwt')
   @ApiResponse({ description: 'returns the cat with deleted: true' })
   @ApiNotFoundResponse({ description: 'cat not found' })
   @ApiForbiddenResponse({ description: 'user must belong to a company' })
   async delete(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
-    const deletedCat = await this.catsService.remove(
-      +id,
-      user.company.id,
-      user.id,
-    );
+    await this.catsService.remove(+id, user.company.id, user.id);
 
-    return successResponse(deletedCat, 'cat deleted successfully');
+    return successResponse(null, 'cat deleted successfully');
   }
 
   @HttpCode(HttpStatus.OK)
