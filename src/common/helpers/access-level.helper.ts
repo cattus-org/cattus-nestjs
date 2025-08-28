@@ -1,4 +1,4 @@
-import { UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException } from '@nestjs/common';
 import { AdminAccess } from '../constants/user.constants';
 
 export function hasRoleOrSelf(
@@ -10,6 +10,6 @@ export function hasRoleOrSelf(
   const hasRole = roles.includes(currentUser.access_level);
 
   if (!isSelf && !hasRole) {
-    throw new UnauthorizedException('access denied');
+    throw new ForbiddenException('access denied');
   }
 }

@@ -106,5 +106,3 @@ export class CompaniesController {
     return await this.companiesService.softDelete(+id, user);
   }
 }
-
-//TODO - arrumar forbidden / unauthorized - ver qual o correto pra cada caso

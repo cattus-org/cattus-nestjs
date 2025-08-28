@@ -47,5 +47,3 @@ export class CamerasRepository {
     return await this.camerasRepository.delete({ id });
   }
 }
-
-//TODO - adicionar deleted: false nos filtros de busca (em todos) e company

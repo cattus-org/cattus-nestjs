@@ -17,9 +17,9 @@ import {
   ApiBearerAuth,
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiResponse,
-  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { PaginationDTO } from 'src/common/dto/pagination.dto';
 import { Public } from 'src/common/decorators/public.decorator';
@@ -50,7 +50,7 @@ export class UsersController {
   @Get()
   @ApiBearerAuth('jwt')
   @ApiResponse({ description: 'returns the user list' })
-  @ApiUnauthorizedResponse({ description: 'access denied' })
+  @ApiForbiddenResponse({ description: 'access denied' })
   @Roles('admin', 'owner')
   async findAll(
     @Query() paginationDTO: PaginationDTO,

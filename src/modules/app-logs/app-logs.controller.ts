@@ -5,8 +5,8 @@ import { JwtPayload } from 'src/common/interfaces/jwt-payload.interfaces';
 import { PaginationDTO } from 'src/common/dto/pagination.dto';
 import {
   ApiBearerAuth,
+  ApiForbiddenResponse,
   ApiResponse,
-  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { successResponse } from 'src/common/helpers/response.helper';
@@ -20,7 +20,7 @@ export class AppLogsController {
   @Get()
   @ApiBearerAuth('jwt')
   @ApiResponse({ description: 'returns a system logs list' })
-  @ApiUnauthorizedResponse({ description: 'access denied' })
+  @ApiForbiddenResponse({ description: 'access denied' })
   @Roles('admin', 'owner')
   async findAll(
     @Query() paginationDTO: PaginationDTO,

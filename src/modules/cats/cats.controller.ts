@@ -190,4 +190,3 @@ export class CatsController {
 }
 
 //TODO - criar job para apagar dados com deleted - colocar um 'deletedDate' nas entidades?
-//TODO - filtrar gets por company

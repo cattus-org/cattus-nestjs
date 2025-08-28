@@ -302,5 +302,3 @@ export class CatsService {
     }
   }
 }
-
-//TODO - adicionar paginação e filtros nos getAll
