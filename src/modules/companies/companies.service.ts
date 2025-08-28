@@ -11,6 +11,7 @@ import { S3Service } from '../aws/s3/s3.service';
 import { AppLogsService } from '../app-logs/app-logs.service';
 import { JwtPayload } from 'src/common/interfaces/jwt-payload.interfaces';
 import { UsersRepository } from '../users/users.repository';
+import { PaginationDTO } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class CompaniesService {
@@ -67,9 +68,14 @@ export class CompaniesService {
     }
   }
 
-  async findAll() {
+  async findAll(paginationDto: PaginationDTO) {
     try {
-      const companies = await this.companiesRepository.findAll();
+      const { deleted = false, limit = 10, offset = 30 } = paginationDto;
+      const companies = await this.companiesRepository.findAll(
+        limit,
+        offset,
+        deleted,
+      );
 
       await this.appLogsService.create({
         action: 'findAll',

@@ -34,8 +34,12 @@ export class CompaniesRepository {
     return await this.companiesRepository.findOneBy({ id });
   }
 
-  async findAll() {
-    return await this.companiesRepository.find();
+  async findAll(limit: number, offset: number, deleted: boolean) {
+    return await this.companiesRepository.find({
+      where: { deleted },
+      take: limit,
+      skip: offset,
+    });
   }
 
   async update(company: Company) {

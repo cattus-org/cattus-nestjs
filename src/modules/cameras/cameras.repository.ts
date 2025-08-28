@@ -26,9 +26,16 @@ export class CamerasRepository {
     });
   }
 
-  async findAll(companyId: number) {
+  async findAll(
+    companyId: number,
+    limit: number,
+    offset: number,
+    deleted: boolean,
+  ) {
     return await this.camerasRepository.find({
-      where: { company: { id: companyId } },
+      where: { company: { id: companyId }, deleted },
+      take: limit,
+      skip: offset,
     });
   }
 
@@ -41,4 +48,4 @@ export class CamerasRepository {
   }
 }
 
-//TODO - adicionar deleted: false nos filtros de busca (em todos)
+//TODO - adicionar deleted: false nos filtros de busca (em todos) e company

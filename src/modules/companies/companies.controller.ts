@@ -11,6 +11,7 @@ import {
   HttpStatus,
   UploadedFile,
   BadRequestException,
+  Query,
 } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
@@ -28,6 +29,7 @@ import { JwtPayload } from 'src/common/interfaces/jwt-payload.interfaces';
 import { successResponse } from 'src/common/helpers/response.helper';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { CattusAdmin } from 'src/common/constants/user.constants';
+import { PaginationDTO } from 'src/common/dto/pagination.dto';
 
 @Controller('companies')
 export class CompaniesController {
@@ -68,8 +70,8 @@ export class CompaniesController {
   @HttpCode(HttpStatus.OK)
   @Get()
   @Roles(CattusAdmin)
-  async findAll() {
-    return await this.companiesService.findAll();
+  async findAll(@Query() paginationDto: PaginationDTO) {
+    return await this.companiesService.findAll(paginationDto);
   }
 
   @ApiBearerAuth('jwt')

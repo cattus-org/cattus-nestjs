@@ -6,6 +6,7 @@ import { CamerasRepository } from './cameras.repository';
 import { UsersService } from '../users/users.service';
 import { CompaniesService } from '../companies/companies.service';
 import { AppLogsService } from '../app-logs/app-logs.service';
+import { PaginationDTO } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class CamerasService {
@@ -50,9 +51,15 @@ export class CamerasService {
     }
   }
 
-  async findAll(userJwt: JwtPayload) {
+  async findAll(userJwt: JwtPayload, paginationDTO?: PaginationDTO) {
     try {
-      const cameras = await this.camerasRepository.findAll(userJwt.company.id);
+      const { deleted = false, limit = 10, offset = 0 } = paginationDTO;
+      const cameras = await this.camerasRepository.findAll(
+        userJwt.company.id,
+        limit,
+        offset,
+        deleted,
+      );
 
       await this.appLogsService.create({
         action: 'findAll',

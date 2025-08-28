@@ -8,6 +8,7 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { CamerasService } from './cameras.service';
 import { CreateCameraDto } from './dto/create-camera.dto';
@@ -21,6 +22,7 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 import { successResponse } from 'src/common/helpers/response.helper';
+import { PaginationDTO } from 'src/common/dto/pagination.dto';
 
 @Controller('cameras')
 export class CamerasController {
@@ -44,8 +46,11 @@ export class CamerasController {
   @ApiBearerAuth('jwt')
   @ApiResponse({ description: 'cameras successfully retrieved' })
   @ApiForbiddenResponse({ description: 'user must belong to a company' })
-  async findAll(@CurrentUser() user: JwtPayload) {
-    const cameras = await this.camerasService.findAll(user);
+  async findAll(
+    @CurrentUser() user: JwtPayload,
+    @Query() paginationDTO: PaginationDTO,
+  ) {
+    const cameras = await this.camerasService.findAll(user, paginationDTO);
     return successResponse(cameras, 'cameras successfuly retrieved');
   }
 

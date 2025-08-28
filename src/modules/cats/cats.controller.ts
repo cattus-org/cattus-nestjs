@@ -158,7 +158,6 @@ export class CatsController {
     return successResponse(deletedCat, 'cat soft deleted successfully');
   }
 
-  //TODO - arrumar esse retorno
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   @ApiBearerAuth('jwt')
