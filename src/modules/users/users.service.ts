@@ -219,6 +219,11 @@ export class UsersService {
         findedUser.password = await hash(updateUserDto.password, 10);
       }
 
+      if (updateUserDto.deleted) {
+        findedUser.deleted = updateUserDto.deleted;
+        findedUser.deletedAt = new Date();
+      }
+
       findedUser.email = updateUserDto.email ?? findedUser.email;
       findedUser.name = updateUserDto.name ?? findedUser.name;
 

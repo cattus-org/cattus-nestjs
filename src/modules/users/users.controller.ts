@@ -132,6 +132,5 @@ export class UsersController {
     return successResponse(null, 'password updated successfully');
   }
 
-  //TODO - criar rota pra reativar o user
   //TODO - add logoff route
 }
