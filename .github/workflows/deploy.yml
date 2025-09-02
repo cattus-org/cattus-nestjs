@@ -27,4 +27,4 @@ jobs:
           cd cattus-nestjs
           git checkout cicd-test
           git pull origin cicd-test
-          docker-compose up -d --build
+          docker compose up -d --build
