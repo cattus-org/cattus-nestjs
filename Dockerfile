@@ -1,5 +1,5 @@
 # Dockerfile para aplicação NestJS
-FROM node:18-alpine
+FROM node:22-alpine
 
 # Diretório de trabalho dentro do container
 WORKDIR /app
