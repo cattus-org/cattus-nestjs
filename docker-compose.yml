@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    network_mode: "host"
+    restart: always
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+    command: ["npm", "run", "start:prod"]
