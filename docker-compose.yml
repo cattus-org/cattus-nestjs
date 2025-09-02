@@ -8,6 +8,7 @@ services:
     restart: always
     environment:
       NODE_ENV: production
-    volumes:
-      - .:/app
+    # Removido o volume para evitar sobrescrever arquivos essenciais da imagem
+    # volumes:
+    #   - .:/app
     command: ["npm", "run", "start:prod"]
