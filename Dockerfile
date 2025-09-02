@@ -4,17 +4,17 @@ FROM node:18-alpine
 # Diretório de trabalho dentro do container
 WORKDIR /app
 
-# Copiar package.json e package-lock.json para instalar dependências
-COPY package*.json ./
+# Copiar package.json e yarn.lock para instalar dependências
+COPY package.json yarn.lock ./
 
 # Instalar dependências
-RUN npm install
+RUN yarn install
 
 # Copiar todo o código para dentro do container
 COPY . .
 
 # Build da aplicação
-RUN npm run build
+RUN yarn build
 
 # Expor a porta padrão do NestJS
 EXPOSE 3000
