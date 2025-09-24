@@ -25,6 +25,6 @@ jobs:
             git clone https://github.com/${{ github.repository }}.git
           fi
           cd cattus-nestjs
-          git checkout cicd-test
-          git pull origin cicd-test
+          git checkout main
+          git pull origin main
           docker compose up -d --build
