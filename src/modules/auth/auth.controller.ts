@@ -10,6 +10,7 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { Public } from 'src/common/decorators/public.decorator';
 import {
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiResponse,
@@ -35,13 +36,11 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth('jwt')
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiResponse({ description: '{ valid: true, user: tokenData }' })
-  @Get('/verify')
+  @Get('verify')
   check(@CurrentUser() user: JwtPayload) {
-    return {
-      valid: true,
-      user,
-    };
+    return successResponse({ user }, 'valid token');
   }
 }
