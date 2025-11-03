@@ -11,6 +11,13 @@ export class CreateActivityDto {
   catId: number;
 
   @ApiProperty({
+    description: 'id of the camera that recorded the activity',
+    example: 1,
+  })
+  @IsNumber()
+  cameraId: number;
+
+  @ApiProperty({
     description: 'activity title',
     enum: ActivityTitle,
     example: ActivityTitle.EAT,

@@ -24,6 +24,7 @@ export class ActivitiesService {
 
       const newActivity = await this.activitiesRepository.create({
         cat,
+        cameraId: createActivityDto.cameraId,
         title: createActivityDto.title,
         startedAt: createActivityDto.startedAt,
         endedAt: createActivityDto.endedAt,

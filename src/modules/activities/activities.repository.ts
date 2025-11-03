@@ -13,6 +13,7 @@ export class ActivitiesRepository {
 
   async create(createActivity: {
     cat: Cat;
+    cameraId: number;
     title: string;
     startedAt: Date;
     endedAt?: Date;
