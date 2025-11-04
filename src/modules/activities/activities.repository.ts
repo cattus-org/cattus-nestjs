@@ -25,6 +25,7 @@ export class ActivitiesRepository {
   async findAllByCatId(catId: number, limit: number, offset: number) {
     return await this.activitiesRepository.find({
       where: { cat: { id: catId } },
+      relations: ['camera'],
       take: limit,
       skip: offset,
     });
@@ -33,16 +34,32 @@ export class ActivitiesRepository {
   async findAllByCompanyId(companyId: number, limit: number, offset: number) {
     return await this.activitiesRepository.find({
       where: { cat: { company: { id: companyId } } },
+      relations: ['camera'],
       take: limit,
       skip: offset,
     });
   }
 
   async findByActivityId(id: number) {
-    return await this.activitiesRepository.findOneBy({ id });
+    return await this.activitiesRepository.findOne({
+      where: { id },
+      relations: ['camera']
+    });
   }
 
   async updateActivity(activity: Activity) {
     return await this.activitiesRepository.save(activity);
+  }
+
+  async findAllByCameraId(cameraId: number, limit: number, offset: number) {
+    return await this.activitiesRepository.find({
+      where: { camera: { id: cameraId } },
+      relations: ['cat', 'camera'],
+      take: limit,
+      skip: offset,
+      order: {
+        startedAt: 'DESC'
+      }
+    });
   }
 }

@@ -35,6 +35,23 @@ export class ActivitiesController {
   }
 
   @HttpCode(HttpStatus.OK)
+  @Get('camera/:id')
+  @ApiBearerAuth('jwt')
+  @ApiResponse({ description: 'returns a list of activities from a specific camera' })
+  async findByCamera(
+    @Param('id') id: string,
+    @CurrentUser() user: JwtPayload,
+    @Query() paginationDTO: PaginationDTO,
+  ) {
+    const activities = await this.activitiesService.findAllByCamera(
+      +id,
+      user,
+      paginationDTO,
+    );
+    return successResponse(activities, 'activities found successfully');
+  }
+
+  @HttpCode(HttpStatus.OK)
   @Get(':id/cat')
   @ApiBearerAuth('jwt')
   @ApiResponse({ description: 'returns a list of activities' })

@@ -4,6 +4,7 @@ import { ActivitiesController } from './activities.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Activity } from './entities/activity.entity';
 import { CatsModule } from '../cats/cats.module';
+import { CamerasModule } from '../cameras/cameras.module';
 import { AppLogsModule } from '../app-logs/app-logs.module';
 import { ActivitiesRepository } from './activities.repository';
 
@@ -11,6 +12,7 @@ import { ActivitiesRepository } from './activities.repository';
   imports: [
     TypeOrmModule.forFeature([Activity]),
     forwardRef(() => CatsModule),
+    CamerasModule,
     AppLogsModule,
   ],
   controllers: [ActivitiesController],

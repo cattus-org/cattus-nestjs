@@ -26,6 +26,10 @@ export class CamerasRepository {
     });
   }
 
+  async findByIdWithoutCompany(id: number) {
+    return await this.camerasRepository.findOne({ where: { id, deleted: false } });
+  }
+
   async findAll(
     companyId: number,
     limit: number,

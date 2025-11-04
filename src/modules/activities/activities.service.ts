@@ -4,6 +4,7 @@ import { UpdateActivityDto } from './dto/update-activity.dto';
 import { AppLogsService } from '../app-logs/app-logs.service';
 import { ActivitiesRepository } from './activities.repository';
 import { CatsRepository } from '../cats/cats.repository';
+import { CamerasRepository } from '../cameras/cameras.repository';
 import { JwtPayload } from 'src/common/interfaces/jwt-payload.interfaces';
 import { PaginationDTO } from 'src/common/dto/pagination.dto';
 
@@ -12,6 +13,7 @@ export class ActivitiesService {
   constructor(
     private readonly activitiesRepository: ActivitiesRepository,
     private readonly catsRepository: CatsRepository,
+    private readonly camerasRepository: CamerasRepository,
     private readonly appLogsService: AppLogsService,
   ) {}
 
@@ -21,6 +23,11 @@ export class ActivitiesService {
         createActivityDto.catId,
       );
       if (!cat) throw new NotFoundException('cat not found');
+
+      if (createActivityDto.cameraId) {
+        const camera = await this.camerasRepository.findByIdWithoutCompany(createActivityDto.cameraId);
+        if (!camera) throw new NotFoundException('camera not found');
+      }
 
       const newActivity = await this.activitiesRepository.create({
         cat,
@@ -137,6 +144,39 @@ export class ActivitiesService {
         resource: 'ACTIVITIES',
         details: `FAIL: ${error.message}`,
       });
+    }
+  }
+
+  async findAllByCamera(cameraId: number, user: JwtPayload, paginationDTO?: PaginationDTO) {
+    try {
+      const camera = await this.camerasRepository.findById(cameraId, user.company.id);
+      if (!camera) throw new NotFoundException('camera not found');
+
+      const { limit = 30, offset = 0 } = paginationDTO;
+      const activities = await this.activitiesRepository.findAllByCameraId(
+        cameraId,
+        limit,
+        offset,
+      );
+
+      await this.appLogsService.create({
+        action: 'findAllByCamera',
+        resource: 'ACTIVITIES',
+        companyId: user.company.id,
+        user: user.id.toString(),
+      });
+
+      return activities;
+    } catch (error) {
+      await this.appLogsService.create({
+        action: 'findAllByCamera',
+        resource: 'ACTIVITIES',
+        companyId: user.company.id,
+        user: user.id.toString(),
+        details: `FAIL: ${error.message}`,
+      });
+
+      throw error;
     }
   }
 }

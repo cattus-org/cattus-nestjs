@@ -1,4 +1,5 @@
 import { ActivityTitle } from 'src/common/constants/activity.constants';
+import { Camera } from 'src/modules/cameras/entities/camera.entity';
 import { Cat } from 'src/modules/cats/entities/cat.entity';
 import {
   Column,
@@ -22,6 +23,12 @@ export class Activity {
 
   @ManyToOne(() => Cat, (cat) => cat.activities, { onDelete: 'CASCADE' })
   cat: Cat;
+
+  @ManyToOne(() => Camera, { onDelete: 'SET NULL', nullable: true })
+  camera: Camera;
+
+  @Column({ nullable: true })
+  cameraId: number;
 
   @Column()
   startedAt: Date;
