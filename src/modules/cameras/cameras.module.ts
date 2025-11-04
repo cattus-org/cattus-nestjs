@@ -17,5 +17,6 @@ import { CamerasRepository } from './cameras.repository';
   ],
   controllers: [CamerasController],
   providers: [CamerasService, CamerasRepository],
+  exports: [CamerasService, CamerasRepository],
 })
 export class CamerasModule {}
