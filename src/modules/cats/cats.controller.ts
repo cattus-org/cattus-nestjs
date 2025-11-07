@@ -126,7 +126,7 @@ export class CatsController {
   @HttpCode(HttpStatus.OK)
   @Patch(':id/change-favorite')
   @ApiBearerAuth('jwt')
-  @ApiResponse({ description: 'returns the cat with deleted: true' })
+  @ApiResponse({ description: 'returns the cat with favorite: true' })
   @ApiNotFoundResponse({ description: 'cat not found' })
   @ApiForbiddenResponse({ description: 'user must belong to a company' })
   async changeFavorite(

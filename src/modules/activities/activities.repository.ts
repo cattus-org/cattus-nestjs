@@ -43,7 +43,7 @@ export class ActivitiesRepository {
   async findByActivityId(id: number) {
     return await this.activitiesRepository.findOne({
       where: { id },
-      relations: ['camera']
+      relations: ['camera'],
     });
   }
 
@@ -58,8 +58,8 @@ export class ActivitiesRepository {
       take: limit,
       skip: offset,
       order: {
-        startedAt: 'DESC'
-      }
+        startedAt: 'DESC',
+      },
     });
   }
 }
