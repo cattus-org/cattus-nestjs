@@ -26,5 +26,16 @@ jobs:
           fi
           cd cattus-nestjs
           git checkout main
-          git pull origin main
+          set -e
+          git pull origin main || (git reset --hard HEAD && git pull origin main)
           docker compose up -d --build
+
+    - name: Verificar API após deploy
+      run: |
+        sleep 10 # Aguarda alguns segundos para a API subir
+        response=$(curl -s -o /dev/null -w "%{http_code}" ${{ secrets.EC2_HOST }}/api)
+        if [ "$response" != "200" ]; then
+          echo "API não está respondendo corretamente. Status: $response"
+          exit 1
+        fi
+        echo "API está funcionando!"
