@@ -33,7 +33,7 @@ jobs:
     - name: Verificar API após deploy
       run: |
         sleep 10 # Aguarda alguns segundos para a API subir
-        response=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.EC2_HOST }}/api")
+        response=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.EC2_HOST }}api")
         if [ "$response" != "200" ]; then
           echo "API não está respondendo corretamente. Status: $response"
           exit 1
