@@ -9,6 +9,7 @@ import { UsersModule } from '../users/users.module';
 import { CompaniesModule } from '../companies/companies.module';
 import { AppLogsModule } from '../app-logs/app-logs.module';
 import { PdfModule } from '../pdf/pdf.module';
+import { CatsTasks } from './tasks/cats.tasks';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { PdfModule } from '../pdf/pdf.module';
     PdfModule,
   ],
   controllers: [CatsController],
-  providers: [CatsService, CatsRepository],
+  providers: [CatsService, CatsRepository, CatsTasks],
   exports: [CatsRepository, CatsService],
 })
 export class CatsModule {}

@@ -63,6 +63,12 @@ export class Cat {
   @OneToMany(() => Activity, (activity) => activity.cat)
   activities: Activity[];
 
+  @Column({ type: 'jsonb', nullable: true })
+  lastActivitiesUpdate: {
+    eat?: Date | null;
+    drink?: Date | null;
+  };
+
   @CreateDateColumn()
   createdAt?: Date;
 

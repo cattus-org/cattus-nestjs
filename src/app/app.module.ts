@@ -11,9 +11,11 @@ import { S3Module } from 'src/modules/aws/s3/s3.module';
 import { ActivitiesModule } from 'src/modules/activities/activities.module';
 import { PdfModule } from 'src/modules/pdf/pdf.module';
 import { CamerasModule } from 'src/modules/cameras/cameras.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',
