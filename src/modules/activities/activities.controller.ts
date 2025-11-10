@@ -37,7 +37,9 @@ export class ActivitiesController {
   @HttpCode(HttpStatus.OK)
   @Get('camera/:id')
   @ApiBearerAuth('jwt')
-  @ApiResponse({ description: 'returns a list of activities from a specific camera' })
+  @ApiResponse({
+    description: 'returns a list of activities from a specific camera',
+  })
   async findByCamera(
     @Param('id') id: string,
     @CurrentUser() user: JwtPayload,

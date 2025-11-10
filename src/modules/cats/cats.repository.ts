@@ -59,4 +59,8 @@ export class CatsRepository {
   async hardDelete(catId: number) {
     return await this.catRepository.delete({ id: catId });
   }
+
+  async findAllCats() {
+    return await this.catRepository.find();
+  }
 }

@@ -25,7 +25,9 @@ export class ActivitiesService {
       if (!cat) throw new NotFoundException('cat not found');
 
       if (createActivityDto.cameraId) {
-        const camera = await this.camerasRepository.findByIdWithoutCompany(createActivityDto.cameraId);
+        const camera = await this.camerasRepository.findByIdWithoutCompany(
+          createActivityDto.cameraId,
+        );
         if (!camera) throw new NotFoundException('camera not found');
       }
 
@@ -36,6 +38,30 @@ export class ActivitiesService {
         startedAt: createActivityDto.startedAt,
         endedAt: createActivityDto.endedAt,
       });
+
+      if (createActivityDto.title == 'eat') {
+        const lastActivitiesUpdate = {
+          ...cat.lastActivitiesUpdate,
+          eat: createActivityDto.startedAt,
+        };
+
+        await this.catsRepository.update({
+          ...cat,
+          lastActivitiesUpdate,
+        });
+      }
+
+      if (createActivityDto.title == 'drink') {
+        const lastActivitiesUpdate = {
+          ...cat.lastActivitiesUpdate,
+          drink: createActivityDto.startedAt,
+        };
+
+        await this.catsRepository.update({
+          ...cat,
+          lastActivitiesUpdate,
+        });
+      }
 
       await this.appLogsService.create({
         action: 'create',
@@ -147,9 +173,16 @@ export class ActivitiesService {
     }
   }
 
-  async findAllByCamera(cameraId: number, user: JwtPayload, paginationDTO?: PaginationDTO) {
+  async findAllByCamera(
+    cameraId: number,
+    user: JwtPayload,
+    paginationDTO?: PaginationDTO,
+  ) {
     try {
-      const camera = await this.camerasRepository.findById(cameraId, user.company.id);
+      const camera = await this.camerasRepository.findById(
+        cameraId,
+        user.company.id,
+      );
       if (!camera) throw new NotFoundException('camera not found');
 
       const { limit = 30, offset = 0 } = paginationDTO;

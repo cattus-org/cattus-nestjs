@@ -13,6 +13,7 @@ import { AppLogsService } from '../app-logs/app-logs.service';
 import { PaginationDTO } from 'src/common/dto/pagination.dto';
 import { JwtPayload } from 'src/common/interfaces/jwt-payload.interfaces';
 import { PdfService } from '../pdf/pdf.service';
+import { Cat } from './entities/cat.entity';
 
 @Injectable()
 export class CatsService {
@@ -136,6 +137,27 @@ export class CatsService {
     }
   }
 
+  async findAllWithoutCompany() {
+    try {
+      const cats = await this.catsRepository.findAllCats();
+
+      await this.appLogsService.create({
+        action: 'findAllWithoutCompany',
+        resource: 'CATS',
+      });
+
+      return cats;
+    } catch (error) {
+      await this.appLogsService.create({
+        action: 'findAllWithoutCompany',
+        resource: 'CATS',
+        details: `FAIL: ${error.message}`,
+      });
+
+      throw error;
+    }
+  }
+
   async update(
     catId: number,
     updateCatDto: UpdateCatDto,
@@ -171,6 +193,27 @@ export class CatsService {
         resource: 'CATS',
         companyId,
         user: userId.toString(),
+        details: `FAIL: ${error.message}`,
+      });
+
+      throw error;
+    }
+  }
+
+  async updateByCat(cat: Cat) {
+    try {
+      const updatedCat = await this.catsRepository.update(cat);
+
+      await this.appLogsService.create({
+        action: 'updateByCat',
+        resource: 'CATS',
+      });
+
+      return updatedCat;
+    } catch (error) {
+      await this.appLogsService.create({
+        action: 'updateByCat',
+        resource: 'CATS',
         details: `FAIL: ${error.message}`,
       });
 
