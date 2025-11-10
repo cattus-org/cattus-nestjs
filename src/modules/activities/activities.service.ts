@@ -39,6 +39,30 @@ export class ActivitiesService {
         endedAt: createActivityDto.endedAt,
       });
 
+      if (createActivityDto.title == 'eat') {
+        const lastActivitiesUpdate = {
+          ...cat.lastActivitiesUpdate,
+          eat: createActivityDto.startedAt,
+        };
+
+        await this.catsRepository.update({
+          ...cat,
+          lastActivitiesUpdate,
+        });
+      }
+
+      if (createActivityDto.title == 'drink') {
+        const lastActivitiesUpdate = {
+          ...cat.lastActivitiesUpdate,
+          drink: createActivityDto.startedAt,
+        };
+
+        await this.catsRepository.update({
+          ...cat,
+          lastActivitiesUpdate,
+        });
+      }
+
       await this.appLogsService.create({
         action: 'create',
         resource: 'ACTIVITIES',

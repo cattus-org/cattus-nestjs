@@ -12,7 +12,7 @@ export class CatsTasks {
   private readonly logger = new Logger(CatsTasks.name);
   constructor(private readonly catsService: CatsService) {}
 
-  @Cron(CronExpression.EVERY_MINUTE)
+  @Cron(CronExpression.EVERY_HOUR)
   async handleCatsStatusCheck() {
     this.logger.log('starting cats status validation');
     const cats = await this.catsService.findAllWithoutCompany();
