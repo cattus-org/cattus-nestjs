@@ -14,9 +14,9 @@ async function bootstrap() {
       'https://cattus.vercel.app',
       'http://localhost:5173'
     ],
-    credentials: true,
+    // credentials: true,
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    // allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
 
