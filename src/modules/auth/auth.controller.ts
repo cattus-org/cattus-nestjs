@@ -41,6 +41,6 @@ export class AuthController {
   @ApiResponse({ description: '{ valid: true, user: tokenData }' })
   @Get('verify')
   check(@CurrentUser() user: JwtPayload) {
-    return successResponse({ user }, 'valid token');
+    return successResponse(user, 'valid token');
   }
 }
